@@ -32,7 +32,11 @@ module Netsuite
                  "search_id" => search_id,
                }
       $stderr.puts "Executing request via URL #{url} and headers #{@headers}"
-      results_json = RestClient::Request.execute :method => :get, :url => url, :headers => @headers, :cookies => @cookies
+      results_json = RestClient::Request.execute :method => :get, 
+                                                 :url => url,
+                                                 :headers => @headers,
+                                                 :cookies => @cookies,
+                                                 :timeout => -1
       JSON.parse(results_json)
     end
   end
