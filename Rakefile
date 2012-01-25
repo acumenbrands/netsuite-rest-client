@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "netsuite-rest-client"
   gem.homepage = "http://github.com/jkaneacumen/netsuite-rest-client"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{RESTlet-based client for Netsuite}
+  gem.description = %Q{RESTlet-based client for Netsuite}
   gem.email = "jkane@acumenholdings.com"
   gem.authors = ["Jim Kane"]
   # dependencies defined in Gemfile
