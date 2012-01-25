@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "netsuite-rest-client"
-  s.version = ""
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jim Kane"]
@@ -27,13 +27,14 @@ Gem::Specification.new do |s|
     "VERSION",
     "lib/netsuite-rest-client.rb",
     "lib/restlets/saved_search.js",
+    "netsuite-rest-client.gemspec",
     "spec/netsuite-rest-client_spec.rb",
     "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/jkaneacumen/netsuite-rest-client"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.15"
+  s.rubygems_version = "1.8.11"
   s.summary = "RESTlet-based client for Netsuite"
 
   if s.respond_to? :specification_version then
