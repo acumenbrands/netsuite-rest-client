@@ -15,6 +15,7 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "netsuite-rest-client"
+  gem.version = File.exist?('VERSION') ? File.read('VERSION') : ""
   gem.homepage = "http://github.com/jkaneacumen/netsuite-rest-client"
   gem.license = "MIT"
   gem.summary = %Q{RESTlet-based client for Netsuite}
