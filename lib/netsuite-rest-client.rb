@@ -19,7 +19,7 @@ module Netsuite
       @cookies = { "NS_VER" => "2011.2.0" }
     end
 
-    def get_saved_search(record_type, search_id, batch_size=20000, options={})
+    def get_saved_search(record_type, search_id, batch_size=20000)
       url = BASE_URL  + "?script=10&deploy=1&record_type=#{record_type}&search_id=#{search_id}"
       params = {
                  "script" => 10,
