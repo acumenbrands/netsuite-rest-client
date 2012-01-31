@@ -29,8 +29,6 @@ module Netsuite
                  'start_id'    => 0,
                  'batch_size'  => batch_size }
 
-      $stderr.puts "Executing request via URL #{create_url(params)} and headers #{@headers}"
-
       results = Array.new
       while true
         results_segment = JSON.parse(RestClient::Request.execute :method  => :get,
