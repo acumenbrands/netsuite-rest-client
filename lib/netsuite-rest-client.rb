@@ -33,13 +33,11 @@ module Netsuite
 
       results = Array.new
       while true
-        puts "Fetching from #{params['start_id']}"
         results_segment = JSON.parse(RestClient::Request.execute :method  => :get,
                                                                  :url     => create_url(params),
                                                                  :headers => @headers,
                                                                  :cookies => @cookies,
                                                                  :timeout => timeout)
-        puts results_segment.first.to_s
         break if results_segment.first.empty? || results_segment.first.length < batch_size
         results += results_segment.first
         params['start_id'] = results_segment.last.to_i
