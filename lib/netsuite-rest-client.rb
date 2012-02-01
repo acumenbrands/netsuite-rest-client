@@ -12,7 +12,7 @@ module Netsuite
       super()
 
       auth_string = "NLAuth nlauth_account=#{account_id}," +
-                    "nlauth_email=#{URI.escape(login)}," +
+                    "nlauth_email=#{URI.escape(login, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))}," +
                     "nlauth_signature=#{password}," +
                     "nlauth_role=#{role_id}"
 
@@ -25,7 +25,7 @@ module Netsuite
     def get_saved_search(record_type, search_id, script_id, deploy_id, batch_size=20000, timeout=-1)
       params = { 'script'      => 10,
                  'deploy'      => 1,
-                 'record_type' => URI.escape(record_type),
+                 'record_type' => URI.escape(record_type, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]")),
                  'search_id'   => search_id,
                  'start_id'    => 0,
                  'batch_size'  => batch_size }
