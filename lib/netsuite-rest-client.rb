@@ -25,7 +25,7 @@ module Netsuite
     def get_saved_search(record_type, search_id, script_id, deploy_id, batch_size=20000, timeout=-1)
       params = { 'script'      => 10,
                  'deploy'      => 1,
-                 'record_type' => URI.escape(record_type, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]")),
+                 'record_type' => record_type,
                  'search_id'   => search_id,
                  'start_id'    => 0,
                  'batch_size'  => batch_size }
@@ -46,7 +46,9 @@ module Netsuite
     end
 
     def create_url(params)
-      BASE_URL + '?' + params.map { |key, value| "#{key}=#{value}" }.join('&')
+      BASE_URL + '?' + params.map do |key, value|
+        URI.escape("#{key}=#{value}", Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+      end.join('&')
     end
   end
 end
