@@ -5,6 +5,10 @@ require 'uri'
 module Netsuite
   class Client
     BASE_URL = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
+    DEFAULT_SCRIPT_ID = 10
+    DEFAULT_DEPLOY_ID = 1
+    DEFAULT_BATCH_SIZE = 20000
+    DEFAULT_TIMEOUT = -1
 
     attr_accessor :headers
 
@@ -22,13 +26,13 @@ module Netsuite
       @cookies = { "NS_VER" => "2011.2.0" }
     end
 
-    def get_saved_search(record_type, search_id, script_id, deploy_id, batch_size=20000, timeout=-1)
-      params = { 'script'      => 10,
-                 'deploy'      => 1,
+    def get_saved_search(record_type, search_id, options={})
+      params = { 'script'      => options[:script_id] || DEFAULT_SCRIPT_ID,
+                 'deploy'      => options[:deploy_id] || DEFAULT_DEPLOY_ID,
                  'record_type' => record_type,
                  'search_id'   => search_id,
-                 'start_id'    => 0,
-                 'batch_size'  => batch_size }
+                 'start_id'    => options[:start_id] || 0,
+                 'batch_size'  => options[:batch_size] || DEFAULT_BATCH_SIZE }
 
       results = Array.new
       while true
