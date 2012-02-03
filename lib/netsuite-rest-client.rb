@@ -46,9 +46,7 @@ module Netsuite
     end
 
     def create_url(params)
-      BASE_URL + '?' + params.map do |key, value|
-        URI.escape("#{key}=#{value}", Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
-      end.join('&')
+      BASE_URL + '?' + params.map { |key, value| "#{key}=#{value}" }.join('&')
     end
   end
 end
