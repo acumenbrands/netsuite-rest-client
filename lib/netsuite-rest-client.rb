@@ -27,6 +27,7 @@ module Netsuite
     end
 
     def get_saved_search(record_type, search_id, options={})
+      request_timeout = options[:timeout] || DEFAULT_TIMEOUT
       params = { 'script'      => options[:script_id] || DEFAULT_SCRIPT_ID,
                  'deploy'      => options[:deploy_id] || DEFAULT_DEPLOY_ID,
                  'record_type' => record_type,
@@ -41,7 +42,7 @@ module Netsuite
                                                                  :url     => create_url(params),
                                                                  :headers => @headers,
                                                                  :cookies => @cookies,
-                                                                 :timeout => timeout)
+                                                                 :timeout => request_timeout)
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < batch_size
         params['start_id'] = results_segment.last.to_i
