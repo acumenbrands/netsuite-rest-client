@@ -37,7 +37,7 @@ module Netsuite
 
       results = Array.new
       while true
-        puts "Fetched #{results.count} records so far, now fetching from #{params['start_id']}..."
+        puts "Fetched #{results.count} records so far, now fetching from #{params['start_id']}..." if options[:verbose]
         results_segment = JSON.parse(RestClient::Request.execute :method  => :get,
                                                                  :url     => create_url(params),
                                                                  :headers => @headers,
