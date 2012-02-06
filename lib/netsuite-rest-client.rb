@@ -44,7 +44,7 @@ module Netsuite
                                                                  :cookies => @cookies,
                                                                  :timeout => request_timeout)
         results += results_segment.first
-        break if results_segment.first.empty? || results_segment.first.length < batch_size
+        break if results_segment.first.empty? || results_segment.first.length < params['batch_size']
         params['start_id'] = results_segment.last.to_i
       end
       results
