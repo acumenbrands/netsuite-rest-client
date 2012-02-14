@@ -7,7 +7,7 @@ module Netsuite
     BASE_URL = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
     DEFAULT_SCRIPT_ID = 10
     DEFAULT_DEPLOY_ID = 1
-    DEFAULT_BATCH_SIZE = 20000
+    DEFAULT_BATCH_SIZE = 1000
     DEFAULT_TIMEOUT = -1
 
     attr_accessor :headers
