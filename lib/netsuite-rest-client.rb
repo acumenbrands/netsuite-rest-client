@@ -34,10 +34,10 @@ module Netsuite
                  'internal_id' => internal_id }
 
       result = JSON.parse(RestClient::Request.execute :method  => :get,
-                                                                 :url     => create_url(params),
-                                                                 :headers => @headers,
-                                                                 :cookies => @cookies,
-                                                                 :timeout => request_timeout)
+                                                                  :url     => create_url(params),
+                                                                  :headers => @headers,
+                                                                  :cookies => @cookies,
+                                                                  :timeout => request_timeout)
       result
     end
 
