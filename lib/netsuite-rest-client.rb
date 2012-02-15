@@ -26,6 +26,21 @@ module Netsuite
       @cookies = { "NS_VER" => "2011.2.0" }
     end
 
+    def get(record_type, internal_id, options={})
+      request_timeout = options[:timeout] || DEFAULT_TIMEOUT
+      params = { 'script'      => options[:script_id] || DEFAULT_SCRIPT_ID,
+                 'deploy'      => options[:deploy_id] || DEFAULT_DEPLOY_ID,
+                 'record_type' => record_type,
+                 'internal_id' => internal_id }
+
+      result = JSON.parse(RestClient::Request.execute :method  => :get,
+                                                                 :url     => create_url(params),
+                                                                 :headers => @headers,
+                                                                 :cookies => @cookies,
+                                                                 :timeout => request_timeout)
+      result
+    end
+
     def get_saved_search(record_type, search_id, options={})
       request_timeout = options[:timeout] || DEFAULT_TIMEOUT
       params = { 'script'      => options[:script_id] || DEFAULT_SCRIPT_ID,
