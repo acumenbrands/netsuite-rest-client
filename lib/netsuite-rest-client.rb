@@ -5,10 +5,11 @@ require 'uri'
 module Netsuite
   class Client
     BASE_URL = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
-    DEFAULT_SCRIPT_ID = 10
-    DEFAULT_DEPLOY_ID = 1
-    DEFAULT_BATCH_SIZE = 1000
-    DEFAULT_TIMEOUT = -1
+    DEFAULT_REST_SCRIPT_ID   = 11
+    DEFAULT_SEARCH_SCRIPT_ID = 10
+    DEFAULT_DEPLOY_ID        = 1
+    DEFAULT_BATCH_SIZE       = 1000
+    DEFAULT_TIMEOUT          = -1
 
     attr_accessor :headers
 
@@ -28,7 +29,7 @@ module Netsuite
 
     def get(record_type, internal_id, options={})
       request_timeout = options[:timeout] || DEFAULT_TIMEOUT
-      params = { 'script'      => options[:script_id] || DEFAULT_SCRIPT_ID,
+      params = { 'script'      => options[:script_id] || DEFAULT_REST_SCRIPT_ID,
                  'deploy'      => options[:deploy_id] || DEFAULT_DEPLOY_ID,
                  'record_type' => record_type,
                  'internal_id' => internal_id }
@@ -41,9 +42,15 @@ module Netsuite
       result
     end
 
+    def upsert(record_type, record_data, options={})
+    end
+
+    def update(record_type, internal_id, record_data, options={})
+    end
+
     def get_saved_search(record_type, search_id, options={})
       request_timeout = options[:timeout] || DEFAULT_TIMEOUT
-      params = { 'script'      => options[:script_id] || DEFAULT_SCRIPT_ID,
+      params = { 'script'      => options[:script_id] || DEFAULT_SEARCH_SCRIPT_ID,
                  'deploy'      => options[:deploy_id] || DEFAULT_DEPLOY_ID,
                  'record_type' => record_type,
                  'search_id'   => search_id,
