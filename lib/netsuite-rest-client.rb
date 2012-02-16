@@ -36,7 +36,7 @@ module Netsuite
       @search_deploy_id = options[:search_deploy_id] || DEFAULT_SEARCH_DEPLOY_ID
     end
 
-    def get(record_type, internal_id, options={})
+    def get_records(record_type, internal_id, options={})
       params = { 'script'      => @rest_script_id,
                  'deploy'      => @rest_deploy_id,
                  'record_type' => record_type,
@@ -45,11 +45,14 @@ module Netsuite
       parse_json_result_from_rest(:get, params)
     end
 
-    def upsert(record_type, record_data, options={})
-
+    def initialize_records(record_type, record_data, options={})
     end
 
-    def update(record_type, internal_id, record_data, options={})
+    def update_records(record_type, internal_id, record_data, options={})
+      upsert_records(record_type, internal_id, record_data, options.merge({:update_only=>true}))
+    end
+
+    def upsert_records(record_type, internal_id, record_data, options={})
     end
 
     def get_saved_search(record_type, search_id, options={})
