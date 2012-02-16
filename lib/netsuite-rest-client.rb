@@ -36,7 +36,7 @@ module Netsuite
       @search_deploy_id = options[:search_deploy_id] || DEFAULT_SEARCH_DEPLOY_ID
     end
 
-    def get_record(record_type, internal_id, options={})
+    def get_record(record_type, internal_id)
       params = { 'script'      => @rest_script_id,
                  'deploy'      => @rest_deploy_id,
                  'record_type' => record_type,
@@ -45,25 +45,38 @@ module Netsuite
       parse_json_result_from_rest(:get, params)
     end
 
-    def initialize_record(record_type, options={})
-      params = { 'script' => @rest_script_id,
-                 'deploy' => @rest_deploy_id,
+    def initialize_record(record_type)
+      params = { 'script'      => @rest_script_id,
+                 'deploy'      => @rest_deploy_id,
                  'record_type' => record_type }
 
       parse_json_result_from_rest(:get, params)
     end
 
-    def update(record_type, internal_id, record_data, options={})
-      upsert_records(record_type, internal_id, record_data, options.merge({:update_only=>true}))
+    def update(record_type, internal_id, record_data)
+      upsert(record_type, internal_id, record_data, :update_only=>true)
     end
 
     def upsert(record_type, internal_id, record_data, options={})
+      params = { 'script'      => @rest_script_id,
+                 'deploy'      => @rest_deploy_id,
+                 'record_type' => record_type,
+                 'internal_id' => internal_id,
+                 'update_only' => options[:update_only] }
+
+      parse_json_result_from_rest(:put, params)
     end
 
-    def delete(record_type, internal_id, options={})
+    def delete(record_type, internal_id)
+      params = { 'script'      => @rest_script_id,
+                 'deploy'      => @rest_deploy_id,
+                 'record_type' => record_type,
+                 'internal_id' => internal_id }
+
+      parse_json_result_from_rest(:delete, params)
     end
 
-    def get_saved_search(record_type, search_id, options={})
+    def get_saved_search(record_type, search_id)
       results = Array.new
       params = { 'script'      => @search_script_id,
                  'deploy'      => @search_deploy_id,
@@ -73,7 +86,6 @@ module Netsuite
                  'batch_size'  => @search_batch_size }
 
       while true
-        puts "Fetched #{results.count} records so far, now fetching from #{params['start_id']}..." if options[:verbose]
         results_segment = parse_json_result_from_rest(:get, params)
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < params['batch_size'].to_i
