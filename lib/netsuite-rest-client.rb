@@ -76,7 +76,7 @@ module Netsuite
       parse_json_result_from_rest(:delete, params)
     end
 
-    def get_saved_search(record_type, search_id)
+    def get_saved_search(record_type, search_id, options={})
       results = Array.new
       params = { 'script'      => @search_script_id,
                  'deploy'      => @search_deploy_id,
