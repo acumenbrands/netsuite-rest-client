@@ -2,13 +2,20 @@ require 'rest-client'
 require 'json'
 require 'uri'
 
+BASE_URL                  = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
+DEFAULT_SCRIPT_ID         = 11
+DEFAULT_DEPLOY_ID         = 1
+DEFAULT_SEARCH_BATCH_SIZE = 1000
+DEFAULT_REQUEST_TIMEOUT   = -1
+
+GET          = 'loadRecord'
+INITIALIZE   = 'initlizeRecord'
+UPSERT       = 'upserRecord'
+DELETE       = 'deleteRecord'
+SAVED_SEARCH = 'getSavedSearch'
+
 module Netsuite
   class Client
-    BASE_URL = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
-    DEFAULT_SCRIPT_ID    = 11
-    DEFAULT_DEPLOY_ID    = 1
-    DEFAULT_SEARCH_BATCH_SIZE = 1000
-    DEFAULT_REQUEST_TIMEOUT   = -1
 
     attr_accessor :headers, :request_timeout, :rest_script_id,
                   :search_script_id, :rest_deploy_id, :search_deploy_id
@@ -28,13 +35,14 @@ module Netsuite
 
       @timeout          = options[:timeout] || DEFAULT_REQUEST_TIMEOUT
 
-      @script_id   = options[:rest_script_id] || DEFAULT_REST_SCRIPT_ID
-      @deploy_id   = options[:rest_deploy_id] || DEFAULT_REST_DEPLOY_ID
+      @script_id   = options[:rest_script_id] || DEFAULT_SCRIPT_ID
+      @deploy_id   = options[:rest_deploy_id] || DEFAULT_DEPLOY_ID
     end
 
     def get_record(record_type, internal_id)
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
+                 'operation'   => GET,
                  'record_type' => record_type,
                  'internal_id' => internal_id }
 
@@ -44,6 +52,7 @@ module Netsuite
     def initialize_record(record_type)
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
+                 'operation'   => INITIALIZE,
                  'record_type' => record_type }
 
       parse_json_result_from_rest(:get, params)
@@ -56,6 +65,7 @@ module Netsuite
     def upsert(record_type, internal_id, record_data, options={})
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
+                 'operation'   => UPSERT,
                  'record_type' => record_type,
                  'internal_id' => internal_id,
                  'update_only' => options[:update_only] }
@@ -66,6 +76,7 @@ module Netsuite
     def delete(record_type, internal_id)
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
+                 'operation'   => DELETE,
                  'record_type' => record_type,
                  'internal_id' => internal_id }
 
@@ -76,6 +87,7 @@ module Netsuite
       results = Array.new
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
+                 'operation'   => SAVED_SEARCH,
                  'record_type' => record_type,
                  'search_id'   => search_id,
                  'start_id'    => options[:start_id] || 0,
