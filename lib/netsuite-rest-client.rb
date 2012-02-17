@@ -10,9 +10,9 @@ DEFAULT_REQUEST_TIMEOUT   = -1
 
 GET          = 'loadRecord'
 INITIALIZE   = 'initializeRecord'
-LOOKUP       = 'lookupRecords'
-UPSERT       = 'upsertRecord'
-DELETE       = 'deleteRecord'
+SELECT       = 'selectRecords'
+UPSERT       = 'upsertRecords'
+DELETE       = 'deleteRecords'
 SAVED_SEARCH = 'getSavedSearch'
 
 module Netsuite
@@ -59,15 +59,16 @@ module Netsuite
       parse_json_result_from_rest(:get, params)
     end
 
-    def get_records_by_values(record_type, field_name, field_value, return_column_name)
+    def get_records_by_values(record_type, search_filters, return_columns)
       params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id,
-                 'operation'   => LOOKUP,
-                 'record_type' => record_type,
-                 'field_name'  => field_name,
-                 'field_value' => field_value }
+                 'deploy'      => @deploy_id }
 
-      parse_json_result_from_rest(:get, params)
+      payload = { 'operation'      => SELECT,
+                  'record_type'    => record_type,
+                  'search_filters' => search_filters,
+                  'return_columns' => return_columns }
+
+      parse_json_result_from_rest(:post, params, :payload=>payload)
     end
 
     def update(record_type, internal_id, record_data)
@@ -77,22 +78,24 @@ module Netsuite
     def upsert(record_type, internal_id, record_data, options={})
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
-                 'operation'   => UPSERT,
                  'record_type' => record_type,
-                 'internal_id' => internal_id,
-                 'update_only' => options[:update_only] }
+                 'internal_id' => internal_id }
 
-      parse_json_result_from_rest(:put, params)
+      payload = { 'operation'   => UPSERT,
+                  'update_only' => options[:update_only] }
+
+      parse_json_result_from_rest(:post, params, :payload=>payload)
     end
 
     def delete(record_type, internal_id)
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
-                 'operation'   => DELETE,
                  'record_type' => record_type,
                  'internal_id' => internal_id }
 
-      parse_json_result_from_rest(:delete, params)
+      payload = { 'operation'   => DELETE }
+
+      parse_json_result_from_rest(:post, params)
     end
 
     def get_saved_search(record_type, search_id, options={})
@@ -115,12 +118,20 @@ module Netsuite
       results
     end
 
-    def parse_json_result_from_rest(method, params)
-      JSON.parse(RestClient::Request.execute :method  => method,
-                                             :url     => create_url(params),
-                                             :headers => @headers,
-                                             :cookies => @cookies,
-                                             :timeout => @timeout)
+    def parse_json_result_from_rest(method, params, options={})
+      rest_params = { :method  => method,
+                      :url     => create_url(params),
+                      :headers => @headers,
+                      :cookies => @cookies,
+                      :timeout => @timeout }
+
+      if options[:payload]
+        rest_params[:payload]      = options[:payload].to_json
+        rest_params[:content_type] = :json
+        rest_params[:accept]       = :json
+      end
+
+      JSON.parse(RestClient::Request.execute rest_params)
     end
 
     def create_url(params)
