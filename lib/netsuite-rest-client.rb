@@ -38,6 +38,8 @@ module Netsuite
 
       @script_id   = options[:rest_script_id] || DEFAULT_SCRIPT_ID
       @deploy_id   = options[:rest_deploy_id] || DEFAULT_DEPLOY_ID
+
+      @search_batch_size = options[:search_batch_size] || DEFAULT_SEARCH_BATCH_SIZE
     end
 
     def get_record(record_type, internal_id)
@@ -73,9 +75,10 @@ module Netsuite
 
       while true
         results_segment = parse_json_result_from_rest(:post, params, :payload=>payload)
-        puts results_segment
+        puts results_segment.to_s
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < payload['batch_size'].to_i
+        puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..."
         payload['start_id'] = results_segment.last.to_i
       end
 
