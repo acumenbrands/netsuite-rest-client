@@ -63,8 +63,8 @@ module Netsuite
 
     def get_records_by_values(record_type, search_filters, return_columns)
       results = Array.new
-      params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id }
+      params = { 'script' => @script_id,
+                 'deploy' => @deploy_id }
 
       payload = { 'operation'      => SELECT,
                   'record_type'    => record_type,
