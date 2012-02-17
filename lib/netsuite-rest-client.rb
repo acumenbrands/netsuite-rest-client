@@ -9,8 +9,9 @@ DEFAULT_SEARCH_BATCH_SIZE = 1000
 DEFAULT_REQUEST_TIMEOUT   = -1
 
 GET          = 'loadRecord'
-INITIALIZE   = 'initlizeRecord'
-UPSERT       = 'upserRecord'
+INITIALIZE   = 'initializeRecord'
+LOOKUP       = 'lookupRecords'
+UPSERT       = 'upsertRecord'
 DELETE       = 'deleteRecord'
 SAVED_SEARCH = 'getSavedSearch'
 
@@ -54,6 +55,17 @@ module Netsuite
                  'deploy'      => @deploy_id,
                  'operation'   => INITIALIZE,
                  'record_type' => record_type }
+
+      parse_json_result_from_rest(:get, params)
+    end
+
+    def get_records_by_values(record_type, field_name, field_value, return_column_name)
+      params = { 'script'      => @script_id,
+                 'deploy'      => @deploy_id,
+                 'operation'   => LOOKUP,
+                 'record_type' => record_type,
+                 'field_name'  => field_name,
+                 'field_value' => field_value }
 
       parse_json_result_from_rest(:get, params)
     end
