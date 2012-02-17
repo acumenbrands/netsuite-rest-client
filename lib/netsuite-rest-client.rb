@@ -60,15 +60,26 @@ module Netsuite
     end
 
     def get_records_by_values(record_type, search_filters, return_columns)
+      results = Array.new
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id }
 
       payload = { 'operation'      => SELECT,
                   'record_type'    => record_type,
+                  'start_id'       => 0,
+                  'batch_size'     => @search_batch_size,
                   'search_filters' => search_filters,
                   'return_columns' => return_columns }
 
-      parse_json_result_from_rest(:post, params, :payload=>payload)
+      while true
+        results_segment = parse_json_result_from_rest(:post, params, :payload=>payload)
+        puts results_segment
+        results += results_segment.first
+        break if results_segment.first.empty? || results_segment.first.length < payload['batch_size'].to_i
+        payload['start_id'] = results_segment.last.to_i
+      end
+
+      results
     end
 
     def update(record_type, internal_id, record_data)
@@ -98,14 +109,14 @@ module Netsuite
       parse_json_result_from_rest(:post, params)
     end
 
-    def get_saved_search(record_type, search_id, options={})
+    def get_saved_search(record_type, search_id)
       results = Array.new
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
                  'operation'   => SAVED_SEARCH,
                  'record_type' => record_type,
                  'search_id'   => search_id,
-                 'start_id'    => options[:start_id] || 0,
+                 'start_id'    => 0,
                  'batch_size'  => @search_batch_size }
 
       while true
