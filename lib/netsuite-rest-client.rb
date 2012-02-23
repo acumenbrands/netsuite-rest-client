@@ -61,7 +61,7 @@ module Netsuite
       parse_json_result_from_rest(:get, params)
     end
 
-    def get_records_by_values(record_type, search_filters, return_columns)
+    def search_records(record_type, search_filters, return_columns, options={})
       results = Array.new
       params = { 'script' => @script_id,
                  'deploy' => @deploy_id }
@@ -69,13 +69,12 @@ module Netsuite
       payload = { 'operation'      => SELECT,
                   'record_type'    => record_type,
                   'start_id'       => 0,
-                  'batch_size'     => @search_batch_size,
+                  'batch_size'     => options[:search_batch_size] || @search_batch_size,
                   'search_filters' => search_filters,
                   'return_columns' => return_columns }
 
       while true
         results_segment = parse_json_result_from_rest(:post, params, :payload=>payload)
-        puts results_segment.to_s
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < payload['batch_size'].to_i
         puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..."
@@ -96,7 +95,8 @@ module Netsuite
                  'internal_id' => internal_id }
 
       payload = { 'operation'   => UPSERT,
-                  'update_only' => options[:update_only] }
+                  'update_only' => options[:update_only],
+                  'record_refs' => record_refs }
 
       parse_json_result_from_rest(:post, params, :payload=>payload)
     end
@@ -112,7 +112,7 @@ module Netsuite
       parse_json_result_from_rest(:post, params)
     end
 
-    def get_saved_search(record_type, search_id)
+    def get_saved_search(record_type, search_id, options={})
       results = Array.new
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
@@ -120,12 +120,13 @@ module Netsuite
                  'record_type' => record_type,
                  'search_id'   => search_id,
                  'start_id'    => 0,
-                 'batch_size'  => @search_batch_size }
+                 'batch_size'  => options[:search_batch_size] || @search_batch_size }
 
       while true
         results_segment = parse_json_result_from_rest(:get, params)
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < params['batch_size'].to_i
+        puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..."
         params['start_id'] = results_segment.last.to_i
       end
 
