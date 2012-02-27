@@ -10,7 +10,7 @@ DEFAULT_REQUEST_TIMEOUT   = -1
 
 GET          = 'loadRecord'
 INITIALIZE   = 'initializeRecord'
-SELECT       = 'selectRecords'
+SEARCH       = 'searchRecords'
 UPSERT       = 'upsertRecords'
 DELETE       = 'deleteRecords'
 SAVED_SEARCH = 'getSavedSearch'
@@ -42,6 +42,15 @@ module Netsuite
       @search_batch_size = options[:search_batch_size] || DEFAULT_SEARCH_BATCH_SIZE
     end
 
+    def initialize_record(record_type)
+      params = { 'script'      => @script_id,
+                 'deploy'      => @deploy_id,
+                 'operation'   => INITIALIZE,
+                 'record_type' => record_type }
+
+      parse_json_result_from_rest(:get, params)
+    end
+
     def get_record(record_type, internal_id)
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
@@ -52,21 +61,12 @@ module Netsuite
       parse_json_result_from_rest(:get, params)
     end
 
-    def initialize_record(record_type)
-      params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id,
-                 'operation'   => INITIALIZE,
-                 'record_type' => record_type }
-
-      parse_json_result_from_rest(:get, params)
-    end
-
     def search_records(record_type, search_filters, return_columns, options={})
       results = Array.new
       params = { 'script' => @script_id,
                  'deploy' => @deploy_id }
 
-      payload = { 'operation'      => SELECT,
+      payload = { 'operation'      => SEARCH,
                   'record_type'    => record_type,
                   'start_id'       => 0,
                   'batch_size'     => options[:search_batch_size] || @search_batch_size,
@@ -84,19 +84,15 @@ module Netsuite
       results
     end
 
-    def update(record_type, internal_id, record_data)
-      upsert(record_type, internal_id, record_data, :update_only=>true)
-    end
-
-    def upsert(record_type, internal_id, record_data, options={})
+    def upsert(record_data, options={})
       params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id,
-                 'record_type' => record_type,
-                 'internal_id' => internal_id }
+                 'deploy'      => @deploy_id }
 
-      payload = { 'operation'   => UPSERT,
-                  'update_only' => options[:update_only],
-                  'record_refs' => record_refs }
+      payload = { 'operation'        => UPSERT,
+                  'record_data'      => record_data,
+                  'update_only'      => options[:update_only] || false,
+                  'do_sourcing'      => options[:do_sourcing] || true,
+                  'ignore_mandatory' => options[:ignore_mandatory] || false }
 
       parse_json_result_from_rest(:post, params, :payload=>payload)
     end
