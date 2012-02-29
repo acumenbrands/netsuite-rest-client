@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "lib/netsuite-rest-client.rb",
-    "lib/restlets/saved_search.js",
+    "lib/restlets/rest.js",
     "netsuite-rest-client.gemspec",
     "spec/netsuite-rest-client_spec.rb",
     "spec/spec_helper.rb"
