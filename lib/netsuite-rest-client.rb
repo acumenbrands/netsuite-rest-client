@@ -3,7 +3,7 @@ require 'json'
 require 'uri'
 
 BASE_URL                  = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
-DEFAULT_SCRIPT_ID         = 11
+DEFAULT_SCRIPT_ID         = 10
 DEFAULT_DEPLOY_ID         = 1
 DEFAULT_SEARCH_BATCH_SIZE = 1000
 DEFAULT_REQUEST_TIMEOUT   = -1
@@ -85,28 +85,11 @@ module Netsuite
     end
 
     def upsert(record_type, record_data, options={})
-      params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id }
-
-      payload = { 'operation'        => UPSERT,
-                  'record_type'      => record_type,
-                  'record_data'      => record_data,
-                  'update_only'      => options[:update_only] || false,
-                  'do_sourcing'      => options[:do_sourcing] || true,
-                  'ignore_mandatory' => options[:ignore_mandatory] || false }
-
-      parse_json_result_from_rest(:post, params, :payload=>payload)
+      warn "Method not yet implemented."
     end
 
     def delete(record_type, internal_id)
-      params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id,
-                 'record_type' => record_type,
-                 'internal_id' => internal_id }
-
-      payload = { 'operation'   => DELETE }
-
-      parse_json_result_from_rest(:post, params)
+      warn "Method not yet implemented."
     end
 
     def get_saved_search(record_type, search_id, options={})
