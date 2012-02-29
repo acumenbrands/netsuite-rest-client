@@ -3,7 +3,7 @@ require 'json'
 require 'uri'
 
 BASE_URL                  = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
-DEFAULT_SCRIPT_ID         = 11
+DEFAULT_SCRIPT_ID         = 12
 DEFAULT_DEPLOY_ID         = 1
 DEFAULT_SEARCH_BATCH_SIZE = 1000
 DEFAULT_REQUEST_TIMEOUT   = -1
