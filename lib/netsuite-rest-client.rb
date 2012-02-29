@@ -75,6 +75,7 @@ module Netsuite
 
       while true
         results_segment = parse_json_result_from_rest(:post, params, :payload=>payload)
+        return results_segment.first if results_segment.first.class != Array
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < payload['batch_size'].to_i
         puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..."
@@ -121,6 +122,7 @@ module Netsuite
 
       while true
         results_segment = parse_json_result_from_rest(:get, params)
+        return results_segment.first if results_segment.first.class != Array
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < params['batch_size'].to_i
         puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..."
