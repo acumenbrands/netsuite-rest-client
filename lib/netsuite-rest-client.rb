@@ -146,8 +146,11 @@ module Netsuite
       end
 
       reply = RestClient::Request.execute rest_params
-      puts reply
-      JSON.parse(reply)
+      begin
+        JSON.parse(reply)
+      rescue Exception => e
+        raise "Unable to parse reply from Netsuite: #{reply}"
+      end
     end
 
     def create_url(params)
