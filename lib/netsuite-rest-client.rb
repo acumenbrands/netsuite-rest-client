@@ -8,13 +8,6 @@ DEFAULT_DEPLOY_ID         = 1
 DEFAULT_SEARCH_BATCH_SIZE = 1000
 DEFAULT_REQUEST_TIMEOUT   = -1
 
-GET          = 'loadRecord'
-INITIALIZE   = 'initializeRecord'
-SEARCH       = 'searchRecords'
-UPSERT       = 'upsertRecords'
-DELETE       = 'deleteRecords'
-SAVED_SEARCH = 'getSavedSearch'
-
 module Netsuite
   class Client
 
@@ -45,7 +38,7 @@ module Netsuite
     def initialize_record(record_type)
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
-                 'operation'   => INITIALIZE,
+                 'operation'   => 'CREATE',
                  'record_type' => record_type }
 
       parse_json_result_from_rest(:get, params)
@@ -54,7 +47,7 @@ module Netsuite
     def get_record(record_type, internal_id)
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
-                 'operation'   => GET,
+                 'operation'   => 'LOAD',
                  'record_type' => record_type,
                  'internal_id' => internal_id }
 
@@ -66,7 +59,7 @@ module Netsuite
       params = { 'script' => @script_id,
                  'deploy' => @deploy_id }
 
-      payload = { 'operation'      => SEARCH,
+      payload = { 'operation'      => 'SEARCH',
                   'record_type'    => record_type,
                   'start_id'       => 0,
                   'batch_size'     => options[:search_batch_size] || @search_batch_size,
@@ -89,7 +82,7 @@ module Netsuite
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id }
 
-      payload = { 'operation'        => UPSERT,
+      payload = { 'operation'        => 'UPSERT',
                   'record_type'      => record_type,
                   'record_data'      => record_data,
                   'update_only'      => options[:update_only] || false,
@@ -103,7 +96,7 @@ module Netsuite
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id }
 
-      payload = { 'operation'    => DELETE,
+      payload = { 'operation'    => 'DELETE',
                   'record_type'  => record_type,
                   'internal_ids' => internal_ids }
 
@@ -114,7 +107,7 @@ module Netsuite
       results = Array.new
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
-                 'operation'   => SAVED_SEARCH,
+                 'operation'   => 'SAVED',
                  'record_type' => record_type,
                  'search_id'   => search_id,
                  'start_id'    => 0,
