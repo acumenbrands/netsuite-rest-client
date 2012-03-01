@@ -107,7 +107,7 @@ module Netsuite
                   'record_type'  => record_type,
                   'internal_ids' => internal_ids }
 
-      parse_json_result_from_rest(:post, params)
+      parse_json_result_from_rest(:post, params, :payload=>payload)
     end
 
     def get_saved_search(record_type, search_id, options={})
@@ -145,7 +145,9 @@ module Netsuite
         rest_params[:accept]       = :json
       end
 
-      JSON.parse(RestClient::Request.execute rest_params)
+      reply = RestClient::Request.execute rest_params
+      puts reply
+      JSON.parse(reply)
     end
 
     def create_url(params)
