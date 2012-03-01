@@ -99,13 +99,13 @@ module Netsuite
       parse_json_result_from_rest(:post, params, :payload=>payload)
     end
 
-    def delete(record_type, internal_id)
+    def delete(record_type, internal_ids)
       params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id,
-                 'record_type' => record_type,
-                 'internal_id' => internal_id }
+                 'deploy'      => @deploy_id }
 
-      payload = { 'operation'   => DELETE }
+      payload = { 'operation'    => DELETE,
+                  'record_type'  => record_type,
+                  'internal_ids' => internal_ids }
 
       parse_json_result_from_rest(:post, params)
     end
