@@ -7,6 +7,7 @@ DEFAULT_SCRIPT_ID         = 12
 DEFAULT_DEPLOY_ID         = 1
 DEFAULT_SEARCH_BATCH_SIZE = 1000
 DEFAULT_REQUEST_TIMEOUT   = -1
+MAX_UPSERT_BLOCK_SIZE     = 5
 
 module Netsuite
   class Client
@@ -85,7 +86,6 @@ module Netsuite
       payload = { 'operation'        => 'UPSERT',
                   'record_type'      => record_type,
                   'record_data'      => record_data,
-                  'update_only'      => options[:update_only] || false,
                   'do_sourcing'      => options[:do_sourcing] || true,
                   'ignore_mandatory' => options[:ignore_mandatory] || false }
 
@@ -138,7 +138,7 @@ module Netsuite
         rest_params[:accept]       = :json
       end
 
-      reply = RestClient::Request.execute rest_params
+      reply = RestClient::Request.execute(rest_params)
       begin
         JSON.parse(reply)
       rescue Exception => e
