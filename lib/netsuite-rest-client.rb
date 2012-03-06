@@ -3,11 +3,12 @@ require 'json'
 require 'uri'
 
 BASE_URL                  = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
-DEFAULT_SCRIPT_ID         = 12
+DEFAULT_SCRIPT_ID         = 11
 DEFAULT_DEPLOY_ID         = 1
 DEFAULT_SEARCH_BATCH_SIZE = 1000
 DEFAULT_REQUEST_TIMEOUT   = -1
-MAX_UPSERT_BLOCK_SIZE     = 5
+DEFAULT_UPSERT_BATCH_SIZE = 5
+DEFAULT_DELETE_BATCH_SIZE = 20
 
 module Netsuite
   class Client
@@ -80,27 +81,37 @@ module Netsuite
     end
 
     def upsert(record_type, record_data, options={})
-      params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id }
+      params  = { 'script'      => @script_id,
+                  'deploy'      => @deploy_id }
+      results = Array.new
 
-      payload = { 'operation'        => 'UPSERT',
-                  'record_type'      => record_type,
-                  'record_data'      => record_data,
-                  'do_sourcing'      => options[:do_sourcing] || true,
-                  'ignore_mandatory' => options[:ignore_mandatory] || false }
+      record_data.each_slice(options[:batch_size] || DEFAULT_UPSERT_BATCH_SIZE) do |record_data_chunk|
+        payload = { 'operation'        => 'UPSERT',
+                    'record_type'      => record_type,
+                    'record_data'      => record_data_chunk,
+                    'do_sourcing'      => options[:do_sourcing] || true,
+                    'ignore_mandatory' => options[:ignore_mandatory] || false }
 
-      parse_json_result_from_rest(:post, params, :payload=>payload)
+        results += parse_json_result_from_rest(:post, params, :payload=>payload)
+      end
+
+      results
     end
 
-    def delete(record_type, internal_ids)
-      params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id }
+    def delete(record_type, internal_ids, options={})
+      params  = { 'script'      => @script_id,
+                  'deploy'      => @deploy_id }
+      results = Array.new
 
-      payload = { 'operation'    => 'DELETE',
-                  'record_type'  => record_type,
-                  'internal_ids' => internal_ids }
+      internal_ids.each_slice(options[:batch_size] || DEFAULT_DELETE_BATCH_SIZE) do |internal_ids_chunk|
+        payload = { 'operation'    => 'DELETE',
+                    'record_type'  => record_type,
+                    'internal_ids' => internal_ids_chunk }
 
-      parse_json_result_from_rest(:post, params, :payload=>payload)
+        results += parse_json_result_from_rest(:post, params, :payload=>payload)
+      end
+
+      results
     end
 
     def get_saved_search(record_type, search_id, options={})
