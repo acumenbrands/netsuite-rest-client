@@ -3,17 +3,11 @@ require 'json'
 require 'uri'
 
 BASE_URL                  = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
-DEFAULT_SCRIPT_ID         = 11
+DEFAULT_SCRIPT_ID         = 12
 DEFAULT_DEPLOY_ID         = 1
 DEFAULT_SEARCH_BATCH_SIZE = 1000
 DEFAULT_REQUEST_TIMEOUT   = -1
-
-GET          = 'loadRecord'
-INITIALIZE   = 'initializeRecord'
-SEARCH       = 'searchRecords'
-UPSERT       = 'upsertRecords'
-DELETE       = 'deleteRecords'
-SAVED_SEARCH = 'getSavedSearch'
+MAX_UPSERT_BLOCK_SIZE     = 5
 
 module Netsuite
   class Client
@@ -45,7 +39,7 @@ module Netsuite
     def initialize_record(record_type)
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
-                 'operation'   => INITIALIZE,
+                 'operation'   => 'CREATE',
                  'record_type' => record_type }
 
       parse_json_result_from_rest(:get, params)
@@ -54,7 +48,7 @@ module Netsuite
     def get_record(record_type, internal_id)
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
-                 'operation'   => GET,
+                 'operation'   => 'LOAD',
                  'record_type' => record_type,
                  'internal_id' => internal_id }
 
@@ -66,7 +60,7 @@ module Netsuite
       params = { 'script' => @script_id,
                  'deploy' => @deploy_id }
 
-      payload = { 'operation'      => SEARCH,
+      payload = { 'operation'      => 'SEARCH',
                   'record_type'    => record_type,
                   'start_id'       => 0,
                   'batch_size'     => options[:search_batch_size] || @search_batch_size,
@@ -75,6 +69,7 @@ module Netsuite
 
       while true
         results_segment = parse_json_result_from_rest(:post, params, :payload=>payload)
+        return results_segment.first if results_segment.first.class != Array
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < payload['batch_size'].to_i
         puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..."
@@ -85,18 +80,34 @@ module Netsuite
     end
 
     def upsert(record_type, record_data, options={})
-      warn "Method not yet implemented."
+      params = { 'script'      => @script_id,
+                 'deploy'      => @deploy_id }
+
+      payload = { 'operation'        => 'UPSERT',
+                  'record_type'      => record_type,
+                  'record_data'      => record_data,
+                  'do_sourcing'      => options[:do_sourcing] || true,
+                  'ignore_mandatory' => options[:ignore_mandatory] || false }
+
+      parse_json_result_from_rest(:post, params, :payload=>payload)
     end
 
-    def delete(record_type, internal_id)
-      warn "Method not yet implemented."
+    def delete(record_type, internal_ids)
+      params = { 'script'      => @script_id,
+                 'deploy'      => @deploy_id }
+
+      payload = { 'operation'    => 'DELETE',
+                  'record_type'  => record_type,
+                  'internal_ids' => internal_ids }
+
+      parse_json_result_from_rest(:post, params, :payload=>payload)
     end
 
     def get_saved_search(record_type, search_id, options={})
       results = Array.new
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
-                 'operation'   => SAVED_SEARCH,
+                 'operation'   => 'SAVED',
                  'record_type' => record_type,
                  'search_id'   => search_id,
                  'start_id'    => 0,
@@ -104,6 +115,7 @@ module Netsuite
 
       while true
         results_segment = parse_json_result_from_rest(:get, params)
+        return results_segment.first if results_segment.first.class != Array
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < params['batch_size'].to_i
         puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..."
@@ -126,7 +138,12 @@ module Netsuite
         rest_params[:accept]       = :json
       end
 
-      JSON.parse(RestClient::Request.execute rest_params)
+      reply = RestClient::Request.execute(rest_params)
+      begin
+        JSON.parse(reply)
+      rescue Exception => e
+        raise "Unable to parse reply from Netsuite: #{reply}"
+      end
     end
 
     def create_url(params)
