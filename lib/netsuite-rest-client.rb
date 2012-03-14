@@ -6,6 +6,7 @@ BASE_URL                  = "https://rest.netsuite.com/app/site/hosting/restlet.
 DEFAULT_SCRIPT_ID         = 11
 DEFAULT_DEPLOY_ID         = 1
 DEFAULT_SEARCH_BATCH_SIZE = 1000
+DEFAULT_RETRY_LIMIT       = 20
 DEFAULT_REQUEST_TIMEOUT   = -1
 DEFAULT_UPSERT_BATCH_SIZE = 40
 DEFAULT_DELETE_BATCH_SIZE = 60
@@ -35,6 +36,8 @@ module Netsuite
       @deploy_id   = options[:rest_deploy_id] || DEFAULT_DEPLOY_ID
 
       @search_batch_size = options[:search_batch_size] || DEFAULT_SEARCH_BATCH_SIZE
+
+      @retry_limit = options[:retry_limit] || DEFAULT_RETRY_LIMIT
     end
 
     def initialize_record(record_type)
@@ -69,8 +72,12 @@ module Netsuite
                   'return_columns' => return_columns }
 
       while true
-        results_segment = parse_json_result_from_rest(:post, params, :payload=>payload)
-        return results_segment.first if results_segment.first.class != Array
+        results_segment = nil
+        (0..@retry_limit).each do |attempt|
+          results_segment = parse_json_result_from_rest(:get, params)
+          break if !results_segment.nil? && results_segment.first.class == Array
+        end
+        raise results_segment.first.to_s if results_segment.first.class != Array
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < payload['batch_size'].to_i
         puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..." if options[:verbose]
@@ -125,8 +132,12 @@ module Netsuite
                  'batch_size'  => options[:search_batch_size] || @search_batch_size }
 
       while true
-        results_segment = parse_json_result_from_rest(:get, params)
-        return results_segment.first if results_segment.first.class != Array
+        results_segment = nil
+        (0..@retry_limit).each do |attempt|
+          results_segment = parse_json_result_from_rest(:get, params)
+          break if !results_segment.nil? && results_segment.first.class == Array
+        end
+        raise results_segment.first.to_s if results_segment.first.class != Array
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < params['batch_size'].to_i
         puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..." if options[:verbose]
