@@ -73,7 +73,7 @@ module Netsuite
         return results_segment.first if results_segment.first.class != Array
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < payload['batch_size'].to_i
-        puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..."
+        puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..." if options[:verbose]
         payload['start_id'] = results_segment.last.to_i
       end
 
@@ -129,7 +129,7 @@ module Netsuite
         return results_segment.first if results_segment.first.class != Array
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < params['batch_size'].to_i
-        puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..."
+        puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..." if options[:verbose]
         params['start_id'] = results_segment.last.to_i
       end
 
