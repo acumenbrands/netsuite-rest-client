@@ -74,8 +74,7 @@ module Netsuite
       while true
         results_segment = nil
         (0..@retry_limit).each do |attempt|
-          results_segment = parse_json_result_from_rest(:get, params)
-          return results_segment
+          results_segment = parse_json_result_from_rest(:post, params)
           break if !results_segment.nil? && results_segment.first.class == Array
         end
         raise results_segment.first.to_s if results_segment.first.class != Array
