@@ -1,16 +1,36 @@
-**
-** Generally, all arguments are ultimately strings as they are placed into JSON or URI
-** requests. However, the client is capable of accepting Fixnum objects and others, so long
-** as the data type includes a to_s method. If a specific data type is expected, it will be
-** declared in the params section.
-**
-** Returns are almost always a hash parsed from a JSON casting of the server-side object.
-**
+== Netsuite Rest Client
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
+This is intended to be a RESTlet-based client for Netsuite.  It
+should offer a significant speed advantage over the normal
+SOAP-based connection scheme (and it should cost less to operate
+since it allows 50 simultaneous connections on an ordinary
+license).
 
-initialize
+== Contributing to netsuite-rest-client
+ 
+* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
+* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
+* Fork the project
+* Start a feature/bugfix branch
+* Commit and push until you are happy with your contribution
+* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
+* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+
+== Copyright
+
+Copyright (c) 2012 Acumen Brands, Inc. See LICENSE.txt for
+further details.
+
+== Method Documentation
+
+Generally, all arguments are ultimately strings as they are placed into JSON or URI
+requests. However, the client is capable of accepting Fixnum objects and others, so long
+as the data type includes a to_s method. If a specific data type is expected, it will be
+declared in the params section.
+
+Returns are almost always a hash parsed from a JSON casting of the server-side object.
+
+= initialize
 	Params:
 		account_id: business account id
 		login:      account login associated with the business id
@@ -23,10 +43,7 @@ initialize
 	Example:
 	    Netsuite::Client.new('123456', 'email@domain.suffix', 'passw0rd', '17')
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-
-initialize_record
+= initialize_record
 	Params:
 		record_type: name of the record type
 
@@ -36,10 +53,7 @@ initialize_record
 	Example:
 		initialize_record('InventoryItem')
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-
-get_record
+= get_record
 	Params:
 		record_type: name of the record type
 		internal_id: the internal id of the Netsuite record
@@ -50,10 +64,7 @@ get_record
 	Example:
 		get_record('InventoryItem', '233')
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-
-search_records
+= search_records
 	Params:
 		record_type:    name of the record type
 		search_filters: a hash of fields associated to a hash of the desire value and operator for comparison
@@ -70,10 +81,7 @@ search_records
 		               {'displayName' => {'value'=>'PRODUCTSKU', 'operator'=>'is'}},
 		               {'displayName' => nil, 'custitem22'  => nil})
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-
-upsert
+= upsert
 	Params:
 		record_type: name of the record type
 		record_data: a hash of fields associated with the desired values
@@ -87,17 +95,15 @@ upsert
 
 	Return:
 		An array of responses for each requested write. It will be an internal id for the newly created or updated
-		record paired with the parameters hash used to create or update the record. In the vent of an error, the id will be replaced by the exception caught upon write.
+		record paired with the parameters hash used to create or update the record. In the vent of an error, the id
+		will be replaced by the exception caught upon write.
 
 	Example:
 		upsert('InventoryItem',
 		       [{'id' => {'value'=>'1234567', 'operator=>'is'},
 		         'displayName' => {'value'=>'PRODUCTSKU', 'operator'=>'is'}}])
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-
-delete
+= delete
 	Params:
 		record_type:  name of the record type
 		internal_ids: an array of internal record ids
@@ -111,10 +117,7 @@ delete
 	Example:
 		delete('InventoryItem', ['1', '2356', '584309'])
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-
-get_saved_search
+= get_saved_search
 	Params:
 		record_type: name of the record type the search will return
 		search_id:   id of the saved search
