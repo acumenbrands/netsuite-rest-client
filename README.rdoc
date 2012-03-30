@@ -1,4 +1,4 @@
-= netsuite-rest-client
+== Netsuite Rest Client
 
 This is intended to be a RESTlet-based client for Netsuite.  It
 should offer a significant speed advantage over the normal
@@ -21,3 +21,112 @@ license).
 Copyright (c) 2012 Acumen Brands, Inc. See LICENSE.txt for
 further details.
 
+== Method Documentation
+
+Generally, all arguments are ultimately strings as they are placed into JSON or URI
+requests. However, the client is capable of accepting Fixnum objects and others, so long
+as the data type includes a to_s method. If a specific data type is expected, it will be
+declared in the params section.
+
+Returns are almost always a hash parsed from a JSON casting of the server-side object.
+
+= initialize
+	Params:
+		account_id: business account id
+		login:      account login associated with the business id
+		password:   password for the login
+		role_id:    id of the role for the client to assume
+
+	Return:
+		A new client object with the given parameters
+
+	Example:
+	    Netsuite::Client.new('123456', 'email@domain.suffix', 'passw0rd', '17')
+
+= initialize_record
+	Params:
+		record_type: name of the record type
+
+	Return:
+		A hash of field names with default values for a Netsuite record of the given type
+
+	Example:
+		initialize_record('InventoryItem')
+
+= get_record
+	Params:
+		record_type: name of the record type
+		internal_id: the internal id of the Netsuite record
+
+	Return:
+		A hash of field names populated with values from the record matching the internal id
+
+	Example:
+		get_record('InventoryItem', '233')
+
+= search_records
+	Params:
+		record_type:    name of the record type
+		search_filters: a hash of fields associated to a hash of the desire value and operator for comparison
+		return_columns: a hash of field names associated with field JOIN requests
+		options:
+			:search_batch_size - (String/Fixnum) set a max size of record to fetch in a single request
+			:verbose           - (Boolean) prints status of search after each execution while fetching records
+
+	Return:
+		An array of record hashes
+
+	Example:
+		search_records('InventoryItem',
+		               {'displayName' => {'value'=>'PRODUCTSKU', 'operator'=>'is'}},
+		               {'displayName' => nil, 'custitem22'  => nil})
+
+= upsert
+	Params:
+		record_type: name of the record type
+		record_data: a hash of fields associated with the desired values
+		options:
+			:batch_size       - (String/Fixnum) size of batch to be written in a single request
+			:do_sourcing      - (Boolean) enables or disabled sourcing in nlapiSubmitRecord calls
+			:ignore_mandatory - (Boolean) ignore mandatory feilds
+
+		** If an id is provided as a field, it will updated a record with the given id or fail to write,
+		** otherwise it creates a new record with the given values.
+
+	Return:
+		An array of responses for each requested write. It will be an internal id for the newly created or updated
+		record paired with the parameters hash used to create or update the record. In the vent of an error, the id
+		will be replaced by the exception caught upon write.
+
+	Example:
+		upsert('InventoryItem',
+		       [{'id' => {'value'=>'1234567', 'operator=>'is'},
+		         'displayName' => {'value'=>'PRODUCTSKU', 'operator'=>'is'}}])
+
+= delete
+	Params:
+		record_type:  name of the record type
+		internal_ids: an array of internal record ids
+		options:
+			:batch_size - (String/Fixnum) size of batch to be written in a single request
+
+	Return:
+		An array of response lists. Each record response will be the internal id paired with *false* in the event
+		of success, or an exception in the event of a deletion failure.
+
+	Example:
+		delete('InventoryItem', ['1', '2356', '584309'])
+
+= get_saved_search
+	Params:
+		record_type: name of the record type the search will return
+		search_id:   id of the saved search
+		options:
+			:search_batch_size - (String/Fixnum) set a max size of record to fetch in a single request
+			:verbose           - (Boolean) prints status of search after each execution while fetching records
+
+	Return:
+		A list of record hashes corresponding to each row of the search results.
+
+	Example:
+		get_saved_search('InventoryItem', '726')
