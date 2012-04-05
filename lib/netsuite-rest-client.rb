@@ -96,7 +96,6 @@ module Netsuite
         payload = { 'operation'        => 'UPSERT',
                     'record_type'      => record_type,
                     'record_data'      => record_data_chunk,
-                    'line_items'       => options[:line_items],
                     'do_sourcing'      => options[:do_sourcing] || true,
                     'ignore_mandatory' => options[:ignore_mandatory] || false }
 
