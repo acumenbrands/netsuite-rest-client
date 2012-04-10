@@ -71,18 +71,11 @@ module Netsuite
                   'search_filters' => search_filters,
                   'return_columns' => return_columns }
 
-      while true
-        results_segment = nil
-        (0..@retry_limit).each do |attempt|
-          results_segment = parse_json_result_from_rest(:post, params, payload=>payload)
-          break if !results_segment.nil? && results_segment.first.class == Array
-        end
-        raise results_segment.first.to_s if results_segment.first.class != Array
-        results += results_segment.first
-        break if results_segment.first.empty? || results_segment.first.length < payload['batch_size'].to_i
-        puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..." if options[:verbose]
-        payload['start_id'] = results_segment.last.to_i
-      end
+      begin
+        results_segment, params['start_id'] = *parse_json_result_from_rest(:get, params)
+        results_segment.class == Array ? results += results_segment : raise("Search error: #{results_segment}")
+        puts "Fetched #{results.count} records so far, querying from #{params['start_id']}..." if options[:verbose]
+      end while (results_segment.length == params['batch_size'].to_i)
 
       results
     end
@@ -123,19 +116,19 @@ module Netsuite
 
     def get_saved_search(record_type, search_id, options={})
       results = Array.new
-      params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id,
-                 'operation'   => 'SAVED',
-                 'record_type' => record_type,
-                 'search_id'   => search_id,
-                 'start_id'    => 0,
-                 'batch_size'  => options[:search_batch_size] || @search_batch_size }
+      params  = { 'script'      => @script_id,
+                  'deploy'      => @deploy_id,
+                  'operation'   => 'SAVED',
+                  'record_type' => record_type,
+                  'search_id'   => search_id,
+                  'start_id'    => 0,
+                  'batch_size'  => options[:search_batch_size] || @search_batch_size }
 
       begin
         results_segment, params['start_id'] = *parse_json_result_from_rest(:get, params)
-        results += results_segment
+        results_segment.class == Array ? results += results_segment : raise("Search error: #{results_segment}")
         puts "Fetched #{results.count} records so far, querying from #{params['start_id']}..." if options[:verbose]
-      end while (!results_segment.first.empty? || results_segment.first.length = params['batch_size'].to_i)
+      end while (results_segment.length == params['batch_size'].to_i)
 
       results
     end
