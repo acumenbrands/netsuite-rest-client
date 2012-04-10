@@ -72,10 +72,10 @@ module Netsuite
                   'return_columns' => return_columns }
 
       begin
-        results_segment, params['start_id'] = *parse_json_result_from_rest(:get, params)
+        results_segment, params['start_id'] = *parse_json_result_from_rest(:post, params, :payload=>payload)
         results_segment.class == Array ? results += results_segment : raise("Search error: #{results_segment}")
         puts "Fetched #{results.count} records so far, querying from #{params['start_id']}..." if options[:verbose]
-      end while (results_segment.length == params['batch_size'].to_i)
+      end while (results_segment.length == payload['batch_size'].to_i)
 
       results
     end
