@@ -131,13 +131,11 @@ module Netsuite
                  'start_id'    => 0,
                  'batch_size'  => options[:search_batch_size] || @search_batch_size }
 
-      while true
-        results_segment = parse_json_result_from_rest(:get, params)
-        results += results_segment.first
-        break if results_segment.first.empty? || results_segment.first.length < params['batch_size'].to_i
-        puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..." if options[:verbose]
-        params['start_id'] = results_segment.last.to_i
-      end
+      begin
+        results_segment, params['start_id'] = *parse_json_result_from_rest(:get, params)
+        results += results_segment
+        puts "Fetched #{results.count} records so far, querying from #{params['start_id']}..." if options[:verbose]
+      end while (!results_segment.first.empty? || results_segment.first.length = params['batch_size'].to_i)
 
       results
     end
@@ -156,7 +154,7 @@ module Netsuite
       end
 
       reply = nil
-      retryable(:tries=>@retry_limit, :on=>Exception) do
+      retryable(@retry_limit, Exception) do
         reply = RestClient::Request.execute(rest_params) { |response, request, result, &block|
           case response.code
           when 200
@@ -168,7 +166,7 @@ module Netsuite
       end
 
       begin
-        JSON.parse(reply)
+        JSON.parse(reply, :symbolize_names=>true)
       rescue Exception => e
         raise "Unable to parse reply from Netsuite: #{reply}"
       end
@@ -176,6 +174,16 @@ module Netsuite
 
     def create_url(params)
       BASE_URL + '?' + params.map { |key, value| "#{key}=#{value}" }.join('&')
+    end
+
+    def retryable(tries, exception, &block)
+      begin
+        return yield
+      rescue *exception
+        retry if (tries -= 1) > 0
+      end
+
+      yield
     end
   end
 end
