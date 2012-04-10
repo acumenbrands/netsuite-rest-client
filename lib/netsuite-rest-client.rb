@@ -74,7 +74,7 @@ module Netsuite
       while true
         results_segment = nil
         (0..@retry_limit).each do |attempt|
-          results_segment = parse_json_result_from_rest(:post, params, :payload=>payload)
+          results_segment = parse_json_result_from_rest(:post, params, payload=>payload)
           break if !results_segment.nil? && results_segment.first.class == Array
         end
         raise results_segment.first.to_s if results_segment.first.class != Array
@@ -160,7 +160,15 @@ module Netsuite
         rest_params[:accept]       = :json
       end
 
-      reply = RestClient::Request.execute(rest_params)
+      reply = RestClient::Request.execute(rest_params) { |response, request, result, &block|
+        case response.code
+        when 200
+          response
+        else
+          raise "Error with Netsuite response: #{response}"
+        end
+      }
+      
       begin
         JSON.parse(reply)
       rescue Exception => e
