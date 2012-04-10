@@ -132,12 +132,7 @@ module Netsuite
                  'batch_size'  => options[:search_batch_size] || @search_batch_size }
 
       while true
-        results_segment = nil
-        (0..@retry_limit).each do |attempt|
-          results_segment = parse_json_result_from_rest(:get, params)
-          break if !results_segment.nil? && results_segment.first.class == Array
-        end
-        raise results_segment.first.to_s if results_segment.first.class != Array
+        results_segment = parse_json_result_from_rest(:get, params)
         results += results_segment.first
         break if results_segment.first.empty? || results_segment.first.length < params['batch_size'].to_i
         puts "Fetched #{results.count} records so far, querying from #{results_segment.last}..." if options[:verbose]
@@ -160,15 +155,18 @@ module Netsuite
         rest_params[:accept]       = :json
       end
 
-      reply = RestClient::Request.execute(rest_params) { |response, request, result, &block|
-        case response.code
-        when 200
-          response
-        else
-          raise "Error with Netsuite response: #{response}"
-        end
-      }
-      
+      reply = nil
+      retryable(:tries=>@retry_limit, :on=>Exception) do
+        reply = RestClient::Request.execute(rest_params) { |response, request, result, &block|
+          case response.code
+          when 200
+            response
+          else
+            raise "Error with Netsuite response: #{response}"
+          end
+        }
+      end
+
       begin
         JSON.parse(reply)
       rescue Exception => e
