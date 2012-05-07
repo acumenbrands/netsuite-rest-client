@@ -67,9 +67,16 @@ module Netsuite
       payload = { 'operation'      => 'SEARCH',
                   'record_type'    => record_type,
                   'start_id'       => 0,
-                  'batch_size'     => options[:search_batch_size] || @search_batch_size,
                   'search_filters' => search_filters,
                   'return_columns' => return_columns }
+
+      batch_size = options[:search_batch_size] || @search_batch_size
+      if batch_size.to_i % 1000 == 0
+        params['batch_size'] = batch_size
+      else
+        warn "Batch size is not a multiple of 1000, defaulting to #{DEFAULT_SEARCH_BATCH_SIZE}!"
+        params['batch_size'] = DEFAULT_SEARCH_BATCH_SIZE
+      end
 
       begin
         results_segment, payload['start_id'] = *parse_json_result_from_rest(:post, params, :payload=>payload)
@@ -121,10 +128,18 @@ module Netsuite
                   'operation'   => 'SAVED',
                   'record_type' => record_type,
                   'search_id'   => search_id,
-                  'start_id'    => 0,
-                  'batch_size'  => options[:search_batch_size] || @search_batch_size }
+                  'start_id'    => 0 }
+
+      batch_size = options[:search_batch_size] || @search_batch_size
+      if batch_size.to_i % 1000 == 0
+        params['batch_size'] = batch_size
+      else
+        warn "Batch size is not a multiple of 1000, defaulting to #{DEFAULT_SEARCH_BATCH_SIZE}!"
+        params['batch_size'] = DEFAULT_SEARCH_BATCH_SIZE
+      end
 
       begin
+        puts params['batch_size']
         results_segment, params['start_id'] = *parse_json_result_from_rest(:get, params)
         results_segment.class == Array ? results += results_segment : raise("Search error: #{results_segment}")
         puts "Fetched #{results.count} records so far, querying from #{params['start_id']}..." if options[:verbose]
