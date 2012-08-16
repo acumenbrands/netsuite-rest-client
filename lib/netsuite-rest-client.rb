@@ -3,7 +3,7 @@ require 'json'
 require 'uri'
 
 BASE_URL                  = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
-DEFAULT_SCRIPT_ID         = 11
+DEFAULT_SCRIPT_ID         = 12
 DEFAULT_DEPLOY_ID         = 1
 DEFAULT_SEARCH_BATCH_SIZE = 1000
 DEFAULT_RETRY_LIMIT       = 5
@@ -110,6 +110,8 @@ module Netsuite
                   'deploy'      => @deploy_id }
       results = Array.new
 
+      internal_ids = internal_ids.map { |id| id.to_s }
+
       internal_ids.each_slice(options[:batch_size] || DEFAULT_DELETE_BATCH_SIZE) do |internal_ids_chunk|
         payload = { 'operation'    => 'DELETE',
                     'record_type'  => record_type,
@@ -162,7 +164,7 @@ module Netsuite
 
       reply = nil
       retryable(@retry_limit, Exception) do
-        reply = RestClient::Request.execute(rest_params) { |response, request, result, &block|
+        reply = RestClient::Request.execute(stringify(rest_params)) { |response, request, result, &block|
           case response.code
           when 200
             response
@@ -176,6 +178,19 @@ module Netsuite
         JSON.parse(reply, :symbolize_names=>true)
       rescue Exception => e
         raise "Unable to parse reply from Netsuite: #{reply}"
+      end
+    end
+
+    def stringify(data)
+      if data.class == Array
+        data.map { |value_item| stringify(value_item) }
+      elsif data.class == Hash
+        data.inject({}) do |hash, (key, value)|
+          hash[key.to_s] = stringify(value)
+          hash
+        end
+      else
+        data.to_s
       end
     end
 
