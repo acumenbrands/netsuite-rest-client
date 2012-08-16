@@ -72,15 +72,15 @@ module Netsuite
 
       batch_size = options[:search_batch_size] || @search_batch_size
       if batch_size.to_i % 1000 == 0
-        params['batch_size'] = batch_size
+        payload['batch_size'] = batch_size
       else
         warn "Batch size is not a multiple of 1000, defaulting to #{DEFAULT_SEARCH_BATCH_SIZE}!"
-        params['batch_size'] = DEFAULT_SEARCH_BATCH_SIZE
+        payload['batch_size'] = DEFAULT_SEARCH_BATCH_SIZE
       end
 
       begin
         results_segment, payload['start_id'] = *parse_json_result_from_rest(:post, params, :payload=>payload)
-        results_segment.class == Array ? results += results_segment : raise("Search error: #{results_segment}")
+        results += results_segment unless results_segment.empty?
         puts "Fetched #{results.count} records so far, querying from #{payload['start_id']}..." if options[:verbose]
       end while (results_segment.length == payload['batch_size'].to_i)
 
@@ -175,9 +175,15 @@ module Netsuite
       end
 
       begin
-        JSON.parse(reply, :symbolize_names=>true)
+        parsed = JSON.parse(reply, :symbolize_names=>true)
       rescue Exception => e
         raise "Unable to parse reply from Netsuite: #{reply}"
+      end
+
+      if parsed.first
+        parsed.last[0]
+      else
+        raise "Error processing request: #{parsed.last[0].to_s}"
       end
     end
 
