@@ -157,14 +157,14 @@ module Netsuite
                       :timeout => @timeout }
 
       if options[:payload]
-        rest_params[:payload]      = options[:payload].to_json
+        rest_params[:payload]      = stringify(options[:payload]).to_json
         rest_params[:content_type] = :json
         rest_params[:accept]       = :json
       end
 
       reply = nil
       retryable(@retry_limit, Exception) do
-        reply = RestClient::Request.execute(stringify(rest_params)) { |response, request, result, &block|
+        reply = RestClient::Request.execute(rest_params) { |response, request, result, &block|
           case response.code
           when 200
             response
