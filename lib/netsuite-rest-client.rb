@@ -181,9 +181,9 @@ module Netsuite
       end
 
       if !parsed.first || parsed.flatten.include?("UNEXPECTED_ERROR")
-        raise "Error processing request: #{parsed.last[0][0].to_s}"
+        raise "Error processing request: #{parsed.last.to_s}"
       else
-        parsed.last[0]
+        parsed.last
       end
     end
 
