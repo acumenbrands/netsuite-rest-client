@@ -180,10 +180,10 @@ module Netsuite
         raise "Unable to parse reply from Netsuite: #{reply}"
       end
 
-      if parsed.first
-        parsed.last[0]
-      else
+      if !parsed.first || parsed.flatten.include?("UNEXPECTED_ERROR")
         raise "Error processing request: #{parsed.last[0].to_s}"
+      else
+        parsed.last[0]
       end
     end
 
