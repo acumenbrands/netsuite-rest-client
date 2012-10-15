@@ -8,7 +8,7 @@ require 'netsuite-rest-client/records'
 require 'netsuite-rest-client/version'
 
 if defined?(Rails)
-  require 'acumen_web_services/railtie'
+  require 'netsuite-rest-client/railtie'
 end
 
 I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")

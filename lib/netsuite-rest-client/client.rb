@@ -1,7 +1,3 @@
-require 'rest-client'
-require 'json'
-require 'uri'
-
 BASE_URL                  = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
 DEFAULT_SCRIPT_ID         = 12
 DEFAULT_DEPLOY_ID         = 1
