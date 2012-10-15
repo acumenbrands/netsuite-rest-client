@@ -15,6 +15,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "rspec"
 
+  spec.add_runtime_dependency "activemodel"
   spec.add_runtime_dependency "rest-client"
   spec.add_runtime_dependency "json"
   spec.add_runtime_dependency "uri"

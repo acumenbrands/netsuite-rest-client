@@ -3,6 +3,7 @@ require 'json'
 require 'rest-client'
 
 require 'netsuite-rest-client/client'
+require 'netsuite-rest-client/config'
 require 'netsuite-rest-client/operations'
 require 'netsuite-rest-client/records'
 require 'netsuite-rest-client/version'
