@@ -1,0 +1,12 @@
+restlet_deployment:
+  url:       https://rest.netsuite.com/app/site/hosting/restlet.nl
+  script_id: 12
+  deploy_id: 1
+
+request_options:
+  timeout:           -1
+  retry_limit:       5
+  search_batch_size: 10000
+  upsert_batch_size: 40
+  update_batch_size: 60
+  delete_batch_size: 60
