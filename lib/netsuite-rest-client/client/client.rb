@@ -1,5 +1,7 @@
 module NetsuiteRESTClient
   module Client
+    extend self
+
     extend Components::Header
     extend Components::Operations::Initialize
     extend Components::Operations::Get
@@ -7,138 +9,6 @@ module NetsuiteRESTClient
     extend Components::Operations::Upsert
     extend Components::Operations::Delete
     extend Components::Operations::Search
-
-    def initialize(account_id, login, password, role_id, options={})
-      super()
-
-      auth_string       = "NLAuth nlauth_account=#{account_id}," +
-                          "nlauth_email=#{URI.escape(login, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))}," +
-                          "nlauth_signature=#{password}," +
-                          "nlauth_role=#{role_id}"
-
-      @headers          = { :authorization  => auth_string,
-                            :content_type   => "application/json" }
-
-      @cookies          = { "NS_VER" => "2011.2.0" }
-
-      @timeout          = options[:timeout] || DEFAULT_REQUEST_TIMEOUT
-
-      @script_id   = options[:rest_script_id] || DEFAULT_SCRIPT_ID
-      @deploy_id   = options[:rest_deploy_id] || DEFAULT_DEPLOY_ID
-
-      @search_batch_size = options[:search_batch_size] || DEFAULT_SEARCH_BATCH_SIZE
-
-      @retry_limit = options[:retry_limit] || DEFAULT_RETRY_LIMIT
-    end
-
-    def initialize_record(record_type)
-      params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id,
-                 'operation'   => 'CREATE',
-                 'record_type' => record_type }
-
-      parse_json_result_from_rest(:get, params)
-    end
-
-    def get_record(record_type, internal_id)
-      params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id,
-                 'operation'   => 'LOAD',
-                 'record_type' => record_type,
-                 'internal_id' => internal_id }
-
-      parse_json_result_from_rest(:get, params)
-    end
-
-    def search_records(record_type, search_filters, return_columns, options={})
-      results = Array.new
-      params = { 'script' => @script_id,
-                 'deploy' => @deploy_id }
-
-      payload = { 'operation'      => 'SEARCH',
-                  'record_type'    => record_type,
-                  'start_id'       => 0,
-                  'search_filters' => search_filters,
-                  'return_columns' => return_columns }
-
-      batch_size = options[:search_batch_size] || @search_batch_size
-      if batch_size.to_i % 1000 == 0
-        payload['batch_size'] = batch_size
-      else
-        warn "Batch size is not a multiple of 1000, defaulting to #{DEFAULT_SEARCH_BATCH_SIZE}!"
-        payload['batch_size'] = DEFAULT_SEARCH_BATCH_SIZE
-      end
-
-      begin
-        results_segment, payload['start_id'] = *parse_json_result_from_rest(:post, params, :payload=>payload)
-        results += results_segment unless results_segment.empty?
-        puts "Fetched #{results.count} records so far, querying from #{payload['start_id']}..." if options[:verbose]
-      end while (results_segment.length == payload['batch_size'].to_i)
-
-      results
-    end
-
-    def upsert(record_type, record_data, options={})
-      params  = { 'script'      => @script_id,
-                  'deploy'      => @deploy_id }
-      results = Array.new
-
-      record_data.each_slice(options[:batch_size] || DEFAULT_UPSERT_BATCH_SIZE) do |record_data_chunk|
-        payload = { 'operation'        => 'UPSERT',
-                    'record_type'      => record_type,
-                    'record_data'      => record_data_chunk,
-                    'do_sourcing'      => options[:do_sourcing] || true,
-                    'ignore_mandatory' => options[:ignore_mandatory] || false }
-
-        results += parse_json_result_from_rest(:post, params, :payload=>payload)
-      end
-
-      results
-    end
-
-    def delete(record_type, internal_ids, options={})
-      params  = { 'script'      => @script_id,
-                  'deploy'      => @deploy_id }
-      results = Array.new
-
-      internal_ids = internal_ids.map { |id| id.to_s }
-
-      internal_ids.each_slice(options[:batch_size] || DEFAULT_DELETE_BATCH_SIZE) do |internal_ids_chunk|
-        payload = { 'operation'    => 'DELETE',
-                    'record_type'  => record_type,
-                    'internal_ids' => internal_ids_chunk }
-
-        results += parse_json_result_from_rest(:post, params, :payload=>payload)
-      end
-
-      results
-    end
-
-    def get_saved_search(record_type, search_id, options={})
-      results = Array.new
-      params  = { 'script'      => @script_id,
-                  'deploy'      => @deploy_id,
-                  'operation'   => 'SAVED',
-                  'record_type' => record_type,
-                  'search_id'   => search_id,
-                  'start_id'    => 0 }
-
-      batch_size = options[:search_batch_size] || @search_batch_size
-      if batch_size.to_i % 1000 == 0
-        params['batch_size'] = batch_size
-      else
-        warn "Batch size is not a multiple of 1000, defaulting to #{DEFAULT_SEARCH_BATCH_SIZE}!"
-        params['batch_size'] = DEFAULT_SEARCH_BATCH_SIZE
-      end
-
-      begin
-        results_segment, params['start_id'] = *parse_json_result_from_rest(:get, params)
-        results_segment.class == Array ? results += results_segment : raise("Search error: #{results_segment}")
-        puts "Fetched #{results.count} records so far, querying from #{params['start_id']}..." if options[:verbose]
-      end while (results_segment.length == params['batch_size'].to_i)
-
-      results
-    end
 
     def parse_json_result_from_rest(method, params, options={})
       rest_params = { :method  => method,
