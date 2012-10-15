@@ -1,0 +1,7 @@
+require 'netsuite-rest-client/operations/common'
+require 'netsuite-rest-client/operations/delete'
+require 'netsuite-rest-client/operations/get'
+require 'netsuite-rest-client/operations/initialize'
+require 'netsuite-rest-client/operations/search'
+require 'netsuite-rest-client/operations/update'
+require 'netsuite-rest-client/operations/upsert'
