@@ -1,0 +1,1 @@
+require 'netsuite-rest-client/client/common/header'
