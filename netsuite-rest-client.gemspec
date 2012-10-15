@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name        = 'netsuite-rest-client'
   spec.version     = ::NetsuiteRESTClient::VERSION
   spec.platform    = Gem::Platform::RUBY
-  spec.authors     = [ 'James Christie (JamesChristie)' ]
+  spec.authors     = [ 'Jim Kane (jkaneacumen)', 'James Christie (JamesChristie)' ]
   spec.email       = 'developers@acumenbrands.com'
   spec.homepage    = 'https://github.com/acumenbrands/netsuite-rest-client'
   spec.summary     = 'RESTful client for using Netsuite services via a deplyed RESTlet'

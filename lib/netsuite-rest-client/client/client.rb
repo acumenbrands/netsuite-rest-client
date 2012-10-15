@@ -1,17 +1,12 @@
-BASE_URL                  = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
-DEFAULT_SCRIPT_ID         = 12
-DEFAULT_DEPLOY_ID         = 1
-DEFAULT_SEARCH_BATCH_SIZE = 1000
-DEFAULT_RETRY_LIMIT       = 5
-DEFAULT_REQUEST_TIMEOUT   = -1
-DEFAULT_UPSERT_BATCH_SIZE = 40
-DEFAULT_DELETE_BATCH_SIZE = 60
-
-module Netsuite
-  class Client
-
-    attr_accessor :headers, :request_timeout, :rest_script_id,
-                  :search_script_id, :rest_deploy_id, :search_deploy_id
+module NetsuiteRESTClient
+  module Client
+    extend Components::Header
+    extend Components::Operations::Initialize
+    extend Components::Operations::Get
+    extend Components::Operations::Update
+    extend Components::Operations::Upsert
+    extend Components::Operations::Delete
+    extend Components::Operations::Search
 
     def initialize(account_id, login, password, role_id, options={})
       super()

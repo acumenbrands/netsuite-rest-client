@@ -1,1 +1,0 @@
-require 'netsuite-rest-client/operations/common/core'
