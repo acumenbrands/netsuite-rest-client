@@ -124,7 +124,7 @@ module Netsuite
       results
     end
 
-    def transform_records(initial_record_type, result_record_type, internal_ids, options={})
+    def transform(initial_record_type, result_record_type, internal_ids, options={})
       results = Array.new
       params  = { 'script' => @script_id,
                   'deploy' => @deploy_id }
