@@ -124,23 +124,19 @@ module Netsuite
       results
     end
 
-    def transform(initial_record_type, result_record_type, internal_ids, options={})
+    def transform(initial_record_type, result_record_type, internal_id, field_changes, sublist_changes, options={})
       results = Array.new
       params  = { 'script' => @script_id,
                   'deploy' => @deploy_id }
 
-      internal_ids = internal_ids.map { |id| id.to_s }
+      payload = { 'operation'           => 'TRANSFORM',
+                  'initial_record_type' => initial_record_type,
+                  'result_record_type'  => result_record_type,
+                  'internal_id'         => internal_id,
+                  'field_changes'       => field_changes,
+                  'sublist_changes'     => sublist_changes }
 
-      internal_ids.each_slice(options[:batch_size] || DEFAULT_TRANSFORM_BATCH_SIZE) do |internal_ids_chunk|
-        payload = { 'operation'           => 'TRANSFORM',
-                    'initial_record_type' => initial_record_type,
-                    'result_record_type'  => result_record_type,
-                    'internal_ids'        => internal_ids }
-
-        results += parse_json_result_from_rest(:post, params, :payload=>payload)
-      end
-
-      results
+      parse_json_result_from_rest(:post, params, :payload=>payload)
     end
 
     def get_saved_search(record_type, search_id, options={})
