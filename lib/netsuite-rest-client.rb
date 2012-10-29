@@ -3,7 +3,7 @@ require 'json'
 require 'uri'
 
 BASE_URL                     = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
-DEFAULT_SCRIPT_ID            = 12
+DEFAULT_SCRIPT_ID            = 11
 DEFAULT_DEPLOY_ID            = 1
 DEFAULT_SEARCH_BATCH_SIZE    = 1000
 DEFAULT_RETRY_LIMIT          = 5
@@ -129,15 +129,12 @@ module Netsuite
       params  = { 'script' => @script_id,
                   'deploy' => @deploy_id }
 
-      internal_ids = internal_ids.map { |id| id.to_s }
-
-      internal_ids.each_slice(options[:batch_size] || DEFAULT_TRANSFORM_BATCH_SIZE) do |internal_ids_chunk|
-        payload = { 'operation'           => 'TRANSFORM',
-                    'initial_record_type' => initial_record_type,
-                    'result_record_type'  => result_record_type,
-                    'internal_id'         => internal_id,
-                    'field_changes'       => field_changes,
-                    'sublist_changes'     => sublist_changes }
+      payload = { 'operation'           => 'TRANSFORM',
+                  'initial_record_type' => initial_record_type,
+                  'result_record_type'  => result_record_type,
+                  'internal_id'         => internal_id,
+                  'field_changes'       => field_changes,
+                  'sublist_changes'     => sublist_changes }
 
         results += parse_json_result_from_rest(:post, params, :payload=>payload)
       end
