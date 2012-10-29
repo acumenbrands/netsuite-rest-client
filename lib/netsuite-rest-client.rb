@@ -1,29 +1,23 @@
 require 'uri'
 require 'json'
 require 'rest-client'
+require 'active_model'
 
-require 'netsuite-rest-client/client'
-require 'netsuite-rest-client/config'
-require 'netsuite-rest-client/operations'
-require 'netsuite-rest-client/records'
-require 'netsuite-rest-client/version'
+require_relative 'netsuite-rest-client/errors_require'
+require_relative 'netsuite-rest-client/config_require'
+require_relative 'netsuite-rest-client/records_require'
+require_relative 'netsuite-rest-client/client_require'
+require_relative 'netsuite-rest-client/version'
 
 if defined?(Rails)
-  require 'netsuite-rest-client/railtie'
+  require_relative 'netsuite-rest-client/railtie'
 end
 
-I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")
-
 module NetsuiteRESTClient
-  extend Loggable
   extend self
   extend Client
 
   def configure
     block_given? ? yield(Config) : Config
   end
-
-  delegate(*(Config.public_instance_methods(false) +
-    ActiveModel::Observing::ClassMethods.public_instance_methods(false) <<
-    { to: Config }))
 end

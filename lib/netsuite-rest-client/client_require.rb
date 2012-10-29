@@ -1,0 +1,10 @@
+# Load all files within client module
+require_relative 'client/components/header'
+require_relative 'client/components/operations/initialize'
+require_relative 'client/components/operations/get'
+require_relative 'client/components/operations/update'
+require_relative 'client/components/operations/upsert'
+require_relative 'client/components/operations/delete'
+require_relative 'client/components/operations/transform'
+require_relative 'client/components/operations/search'
+require_relative 'client/client'

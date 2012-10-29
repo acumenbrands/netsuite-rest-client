@@ -1,0 +1,11 @@
+# Load all files within records module
+require_relative 'records/common/core'
+require_relative 'records/common/fields'
+require_relative 'records/common/associations'
+require_relative 'records/common/sublists'
+require_relative 'records/inventory_item'
+require_relative 'records/purchase_order'
+require_relative 'records/purchase_order_item'
+require_relative 'records/return_authorization'
+require_relative 'records/sales_order'
+require_relative 'records/sales_order_item'

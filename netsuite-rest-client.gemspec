@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email       = 'developers@acumenbrands.com'
   spec.homepage    = 'https://github.com/acumenbrands/netsuite-rest-client'
   spec.summary     = 'RESTful client for using Netsuite services via a deplyed RESTlet'
-  spec.description = 'TODO'
+  spec.description = "Holy crap! It's a gem!"
 
   spec.add_development_dependency "rspec"
 
