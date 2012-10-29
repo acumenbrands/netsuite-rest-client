@@ -124,7 +124,7 @@ module Netsuite
       results
     end
 
-    def transform(initial_record_type, result_record_type, internal_ids, options={})
+    def transform(initial_record_type, result_record_type, internal_id, field_changes, sublist_changes, options={})
       results = Array.new
       params  = { 'script' => @script_id,
                   'deploy' => @deploy_id }
@@ -135,7 +135,9 @@ module Netsuite
         payload = { 'operation'           => 'TRANSFORM',
                     'initial_record_type' => initial_record_type,
                     'result_record_type'  => result_record_type,
-                    'internal_ids'        => internal_ids }
+                    'internal_id'         => internal_id,
+                    'field_changes'       => field_changes,
+                    'sublist_changes'     => sublist_changes }
 
         results += parse_json_result_from_rest(:post, params, :payload=>payload)
       end
