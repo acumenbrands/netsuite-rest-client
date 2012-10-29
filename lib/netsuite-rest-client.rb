@@ -136,10 +136,7 @@ module Netsuite
                   'field_changes'       => field_changes,
                   'sublist_changes'     => sublist_changes }
 
-        results += parse_json_result_from_rest(:post, params, :payload=>payload)
-      end
-
-      results
+      parse_json_result_from_rest(:post, params, :payload=>payload)
     end
 
     def get_saved_search(record_type, search_id, options={})
