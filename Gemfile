@@ -12,4 +12,5 @@ group :development do
   gem "rspec", "~> 2.3.0"
   gem "jeweler", "~> 1.8.3"
   gem "rcov", ">= 0"
+  gem "tomdoc", "~> 0.2.5"
 end

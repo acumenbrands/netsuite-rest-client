@@ -1,7 +1,0 @@
-require 'netsuite-rest-client/records/common'
-require 'netsuite-rest-client/records/inventory_item'
-require 'netsuite-rest-client/records/purchase_order'
-require 'netsuite-rest-client/records/purchase_order_item'
-require 'netsuite-rest-client/records/return_authorization'
-require 'netsuite-rest-client/records/sales_order'
-require 'netsuite-rest-client/records/sales_order_item'

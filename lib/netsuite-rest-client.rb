@@ -17,6 +17,19 @@ module NetsuiteRESTClient
   extend self
   extend Client
 
+  # Public: Accepts a block setting options on the NetsuiteRESTClient::Config singleton.
+  #
+  # block - A block that mutates available options on the NetsuiteRESTClient::Config singleton.
+  #
+  # Yields the NetsuiteRESTClient::Config singleton.
+  #
+  # Examples
+  #
+  #  NetsuiteRESTClient.configure do |config|
+  #    config.request_timeout = 30000
+  #  end
+  #
+  # Returns the NetsuiteRESTClient::Config singleton.
   def configure
     block_given? ? yield(Config) : Config
   end
