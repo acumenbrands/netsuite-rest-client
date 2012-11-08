@@ -3,7 +3,7 @@ module NetsuiteRESTClient
     module Components
       module Operations
         module Initialize
-          def validate_inputs
+          def validate
           end
 
           def initialize_record

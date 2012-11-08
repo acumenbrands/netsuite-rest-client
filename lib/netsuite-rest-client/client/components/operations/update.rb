@@ -3,7 +3,7 @@ module NetsuiteRESTClient
     module Components
       module Operations
         module Update
-          def validate_inputs
+          def validate
           end
 
           def update

@@ -3,7 +3,7 @@ module NetsuiteRESTClient
     module Components
       module Operations
         module Transform
-          def validate_inputs
+          def validate
           end
 
           def transform

@@ -11,6 +11,33 @@ module NetsuiteRESTClient
     extend Components::Operations::Transform
     extend Components::Operations::Search
 
+    # Internal: Constructs the url for request submission.
+    #
+    # Returns the String of the url.
+    def build_url
+    end
+
+    def validate_request
+    end
+
+    # Internal: Submits a request to a constructed service url.
+    #
+    # Returns the raw STRING of a JSON reply.
+    def submit_request
+    end
+
+    # Internal: Parses a JSON String into a Hash.
+    #
+    # Returns the Hash of the parsed reply.
+    def parse_reply
+    end
+
+    # Internal: Builds a request, a url for submission, submites the request and parses the result.
+    #
+    # Returns the parsed JSON reply after request submission.
+    def execute_request
+    end
+
     # def parse_json_result_from_rest(method, params, options={})
     #   rest_params = { :method  => method,
     #                   :url     => create_url(params),

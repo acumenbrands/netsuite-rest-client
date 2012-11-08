@@ -2,6 +2,23 @@ module NetsuiteRESTClient
   module Client
     module Components
       module Header
+        # Internal: Generates the auth string required to consue Netsuite services.
+        #
+        # Returns the String of authentication information.
+        def authentication_string
+        end
+
+        # Internal: Populates the cookies section of the request body.
+        #
+        # Returns the Hash of cookie data.
+        def cookies
+        end
+
+        # Internal: Constructs the entire header for a request.
+        #
+        # Returns the Hash of complete header data.
+        def build_header
+        end
         # extend self
 
         # auth_string       = "NLAuth nlauth_account=#{account_id}," +
