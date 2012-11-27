@@ -56,15 +56,15 @@ module Netsuite
       internal_ids = Array(internal_ids)
 
       params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id,
-                 'operation'   => 'LOAD',
-                 'record_type' => record_type }
+                 'deploy'      => @deploy_id }
+      payload = { 'operation'   => 'LOAD',
+                  'record_type' => record_type }
       results = Array.new
 
       batch_size = options[:load_batch_size] || @load_batch_size
       internal_ids.each_slice(batch_size) do |id_chunk|
-        params['internal_ids'] = id_chunk
-        results += parse_json_result_from_rest(:get, params)
+        payload['internal_ids'] = id_chunk
+        results += parse_json_result_from_rest(:post, params)
       end
 
       results
