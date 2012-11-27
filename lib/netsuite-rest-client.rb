@@ -5,6 +5,7 @@ require 'uri'
 BASE_URL                     = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
 DEFAULT_SCRIPT_ID            = 12
 DEFAULT_DEPLOY_ID            = 1
+DEFAULT_LOAD_BATCH_SIZE      = 1000
 DEFAULT_SEARCH_BATCH_SIZE    = 1000
 DEFAULT_RETRY_LIMIT          = 5
 DEFAULT_REQUEST_TIMEOUT      = -1
@@ -36,6 +37,7 @@ module Netsuite
       @script_id   = options[:rest_script_id] || DEFAULT_SCRIPT_ID
       @deploy_id   = options[:rest_deploy_id] || DEFAULT_DEPLOY_ID
 
+      @load_batch_size   = options[:load_batch_size]   || DEFAULT_LOAD_BATCH_SIZE
       @search_batch_size = options[:search_batch_size] || DEFAULT_SEARCH_BATCH_SIZE
 
       @retry_limit = options[:retry_limit] || DEFAULT_RETRY_LIMIT
@@ -50,14 +52,22 @@ module Netsuite
       parse_json_result_from_rest(:get, params)
     end
 
-    def get_record(record_type, internal_id)
+    def get_record(record_type, internal_ids)
+      internal_ids = Array(internal_ids)
+
       params = { 'script'      => @script_id,
                  'deploy'      => @deploy_id,
                  'operation'   => 'LOAD',
-                 'record_type' => record_type,
-                 'internal_id' => internal_id }
+                 'record_type' => record_type }
+      results = Array.new
 
-      parse_json_result_from_rest(:get, params)
+      batch_size = options[:load_batch_size] || @load_batch_size
+      internal_ids.each_slice(batch_size) do |id_chunk|
+        params['internal_ids'] = id_chunk
+        results += parse_json_result_from_rest(:get, params)
+      end
+
+      results
     end
 
     def search_records(record_type, search_filters, return_columns, options={})
