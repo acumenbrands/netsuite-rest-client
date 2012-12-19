@@ -2,15 +2,16 @@ require 'rest-client'
 require 'json'
 require 'uri'
 
-BASE_URL                     = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
-DEFAULT_SCRIPT_ID            = 12
-DEFAULT_DEPLOY_ID            = 1
-DEFAULT_SEARCH_BATCH_SIZE    = 1000
-DEFAULT_RETRY_LIMIT          = 5
-DEFAULT_REQUEST_TIMEOUT      = -1
-DEFAULT_UPSERT_BATCH_SIZE    = 40
-DEFAULT_DELETE_BATCH_SIZE    = 60
-DEFAULT_TRANSFORM_BATCH_SIZE = 10
+BASE_URL                      = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
+DEFAULT_SCRIPT_ID             = 13
+DEFAULT_DEPLOY_ID             = 1
+DEFAULT_GET_RECORD_BATCH_SIZE = 10000
+DEFAULT_SEARCH_BATCH_SIZE     = 1000
+DEFAULT_RETRY_LIMIT           = 5
+DEFAULT_REQUEST_TIMEOUT       = -1
+DEFAULT_UPSERT_BATCH_SIZE     = 40
+DEFAULT_DELETE_BATCH_SIZE     = 60
+DEFAULT_TRANSFORM_BATCH_SIZE  = 10
 
 module Netsuite
   class Client
@@ -36,7 +37,8 @@ module Netsuite
       @script_id   = options[:rest_script_id] || DEFAULT_SCRIPT_ID
       @deploy_id   = options[:rest_deploy_id] || DEFAULT_DEPLOY_ID
 
-      @search_batch_size = options[:search_batch_size] || DEFAULT_SEARCH_BATCH_SIZE
+      @get_record_batch_size = options[:get_record_batch_size] || DEFAULT_GET_RECORD_BATCH_SIZE
+      @search_batch_size     = options[:search_batch_size]     || DEFAULT_SEARCH_BATCH_SIZE
 
       @retry_limit = options[:retry_limit] || DEFAULT_RETRY_LIMIT
     end
@@ -50,14 +52,23 @@ module Netsuite
       parse_json_result_from_rest(:get, params)
     end
 
-    def get_record(record_type, internal_id)
-      params = { 'script'      => @script_id,
-                 'deploy'      => @deploy_id,
-                 'operation'   => 'LOAD',
-                 'record_type' => record_type,
-                 'internal_id' => internal_id }
+    def get_record(record_type, internal_id_list, return_array_on_single=false)
+      internal_id_list = Array(internal_id_list).uniq
 
-      parse_json_result_from_rest(:get, params)
+      params = { 'script'      => @script_id,
+                 'deploy'      => @deploy_id }
+
+      payload = { 'operation'   => 'LOAD',
+                  'record_type' => record_type }
+
+      results = []
+      internal_id_list.each_slice(@get_record_batch_size) do |id_chunk|
+        payload['internal_id_list'] = id_chunk
+        results += parse_json_result_from_rest(:post, params, :payload=>payload)
+      end
+
+      results = results.first if results.length == 1 && !return_array_on_single
+      results
     end
 
     def search_records(record_type, search_filters, return_columns, options={})
