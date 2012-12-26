@@ -52,7 +52,7 @@ module Netsuite
       parse_json_result_from_rest(:get, params)
     end
 
-    def get_record(record_type, internal_id_list, return_array_on_single=false, options={})
+    def get_record(record_type, internal_id_list, options={})
       internal_id_list = Array(internal_id_list).uniq
 
       params = { 'script'      => @script_id,
@@ -68,7 +68,7 @@ module Netsuite
         puts "Fetched #{results.count} records so far..." if options[:verbose]
       end
 
-      results = results.first if results.length == 1 && !return_array_on_single
+      results = results.first if results.length == 1 && !options[:return_array_on_single]
       results
     end
 
