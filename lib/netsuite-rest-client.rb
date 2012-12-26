@@ -52,7 +52,7 @@ module Netsuite
       parse_json_result_from_rest(:get, params)
     end
 
-    def get_record(record_type, internal_id_list, return_array_on_single=false)
+    def get_record(record_type, internal_id_list, return_array_on_single=false, options={})
       internal_id_list = Array(internal_id_list).uniq
 
       params = { 'script'      => @script_id,
