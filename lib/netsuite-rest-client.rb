@@ -62,7 +62,7 @@ module Netsuite
                   'record_type' => record_type }
 
       results = []
-      internal_id_list.each_slice(@get_record_batch_size) do |id_chunk|
+      internal_id_list.each_slice(options[:get_record_batch_size] || @get_record_batch_size) do |id_chunk|
         payload['internal_id_list'] = id_chunk
         results += parse_json_result_from_rest(:post, params, :payload=>payload)
         puts "Fetched #{results.count} records so far..." if options[:verbose]
