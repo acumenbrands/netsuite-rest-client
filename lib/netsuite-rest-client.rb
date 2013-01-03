@@ -52,7 +52,7 @@ module Netsuite
       parse_json_result_from_rest(:get, params)
     end
 
-    def get_record(record_type, internal_id_list, return_array_on_single=false)
+    def get_record(record_type, internal_id_list, options={})
       internal_id_list = Array(internal_id_list).uniq
 
       params = { 'script'      => @script_id,
@@ -61,13 +61,16 @@ module Netsuite
       payload = { 'operation'   => 'LOAD',
                   'record_type' => record_type }
 
-      results = []
-      internal_id_list.each_slice(@get_record_batch_size) do |id_chunk|
+      results    = []
+      batch_size = options[:get_record_batch_size] || @get_record_batch_size
+
+      internal_id_list.each_slice(batch_size) do |id_chunk|
         payload['internal_id_list'] = id_chunk
         results += parse_json_result_from_rest(:post, params, :payload=>payload)
+        puts "Fetched #{results.count} records so far..." if options[:verbose]
       end
 
-      results = results.first if results.length == 1 && !return_array_on_single
+      results = results.first if results.length == 1 && !options[:return_array_on_single]
       results
     end
 
