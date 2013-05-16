@@ -1,5 +1,9 @@
 == Netsuite Rest Client
 
+*NOTE* This project is being replaced by [rest_suite](https://github.com/acumenbrands/rest_suite/).
+If you're starting a new system, please use that codebase.  We will keep netsuite-rest-client on
+life support for the time being.
+
 This is intended to be a RESTlet-based client for Netsuite.  It
 should offer a significant speed advantage over the normal
 SOAP-based connection scheme (and it should cost less to operate
@@ -15,7 +19,7 @@ license).
 * Commit and push until you are happy with your contribution
 * Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
-* If you're interested in the future of netsuite-rest-client, take a look at the v2 branch.
+* If you're interested in the future of netsuite-rest-client, take a look at the [rest_suite](https://github.com/acumenbrands/rest_suite/).
 
 == Copyright
 
