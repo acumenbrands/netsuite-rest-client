@@ -1,6 +1,6 @@
 == Netsuite Rest Client
 
-*NOTE* This project is being replaced by rest_suite[https://github.com/acumenbrands/rest_suite/].
+*NOTE:* This project is being replaced by rest_suite[https://github.com/acumenbrands/rest_suite/].
 If you're starting a new system, please use that codebase.  We will keep netsuite-rest-client on
 life support for the time being.
 
