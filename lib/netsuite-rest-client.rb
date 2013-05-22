@@ -226,6 +226,8 @@ module Netsuite
           hash[key.to_s] = stringify(value)
           hash
         end
+      elsif !!data == data #boolean?
+        data ? 'T' : 'F'
       else
         data.to_s
       end
