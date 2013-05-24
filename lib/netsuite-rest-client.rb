@@ -34,8 +34,8 @@ module Netsuite
 
       @timeout          = options[:timeout] || DEFAULT_REQUEST_TIMEOUT
 
-      @script_id   = options[:rest_script_id] || DEFAULT_SCRIPT_ID
-      @deploy_id   = options[:rest_deploy_id] || DEFAULT_DEPLOY_ID
+      @script_id   = options[:rest_script_id] || raise(ArgumentError, "Missing script ID")
+      @deploy_id   = options[:rest_deploy_id] || raise(ArgumentError, "Missing deploy ID")
 
       @get_record_batch_size = options[:get_record_batch_size] || DEFAULT_GET_RECORD_BATCH_SIZE
       @search_batch_size     = options[:search_batch_size]     || DEFAULT_SEARCH_BATCH_SIZE
