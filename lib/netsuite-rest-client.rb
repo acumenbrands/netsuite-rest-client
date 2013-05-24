@@ -41,6 +41,7 @@ module Netsuite
       @search_batch_size     = options[:search_batch_size]     || DEFAULT_SEARCH_BATCH_SIZE
 
       @retry_limit = options[:retry_limit] || DEFAULT_RETRY_LIMIT
+      @base_url = Rails.env.production? ? BASE_URL : SANDBOX_URL
     end
 
     def initialize_record(record_type)
@@ -235,7 +236,7 @@ module Netsuite
     end
 
     def create_url(params)
-      BASE_URL + '?' + params.map { |key, value| "#{key}=#{value}" }.join('&')
+      "#{@base_url}?#{params.map { |key, value| "#{key}=#{value}" }.join('&')}"
     end
 
     def retryable(tries, exception, &block)
