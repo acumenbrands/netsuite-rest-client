@@ -188,7 +188,8 @@ module Netsuite
                       :timeout => @timeout }
 
       if options[:payload]
-        rest_params[:payload]      = stringify(options[:payload]).to_json
+        payload                    = collapse_internal_ids(options[:payload])
+        rest_params[:payload]      = stringify(payload).to_json
         rest_params[:content_type] = :json
         rest_params[:accept]       = :json
       end
@@ -245,6 +246,24 @@ module Netsuite
       end
 
       yield
+    end
+
+    def collapse_internal_ids(data)
+      return collapse_hashes(data) if data.class == Hash
+      return collapse_arrays(data) if data.class == Array
+      data
+    end
+
+    def collapse_hashes(data)
+      if (data.keys - [:internalid, :name]).empty?
+        data[:internalid]
+      else
+        data.each { |k,v| data[k] = collapse_internal_ids(v) }
+      end
+    end
+
+    def collapse_arrays(data)
+      data.map { |item| collapse_internal_ids(item) }
     end
   end
 end
