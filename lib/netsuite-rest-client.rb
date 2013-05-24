@@ -8,7 +8,7 @@ module Netsuite
   SANDBOX_URL                   = "https://rest.sandbox.netsuite.com/app/site/hosting/restlet.nl"
   DEFAULT_GET_RECORD_BATCH_SIZE = 10000
   DEFAULT_SEARCH_BATCH_SIZE     = 1000
-  DEFAULT_RETRY_LIMIT           = 5
+  DEFAULT_RETRY_LIMIT           = 0
   DEFAULT_REQUEST_TIMEOUT       = -1
   DEFAULT_UPSERT_BATCH_SIZE     = 40
   DEFAULT_DELETE_BATCH_SIZE     = 60
@@ -20,15 +20,14 @@ module Netsuite
                   :search_script_id, :rest_deploy_id, :search_deploy_id
 
     def initialize(account_id, login, password, role_id, options={})
-      super()
-
       auth_string       = "NLAuth nlauth_account=#{account_id}," +
                           "nlauth_email=#{URI.escape(login, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))}," +
                           "nlauth_signature=#{password}," +
                           "nlauth_role=#{role_id}"
 
       @headers          = { :authorization  => auth_string,
-                            :content_type   => "application/json" }
+                            :content_type   => 'application/json',
+                            :accept         => 'application/json', }
 
       @cookies          = { "NS_VER" => "2011.2.0" }
 
@@ -41,7 +40,7 @@ module Netsuite
       @search_batch_size     = options[:search_batch_size]     || DEFAULT_SEARCH_BATCH_SIZE
 
       @retry_limit = options[:retry_limit] || DEFAULT_RETRY_LIMIT
-      @base_url = Rails.env.production? ? BASE_URL : SANDBOX_URL
+      @base_url = 'production' == ENV['RAILS_ENV'] ? BASE_URL : SANDBOX_URL
     end
 
     def initialize_record(record_type)
@@ -191,12 +190,10 @@ module Netsuite
       if options[:payload]
         payload                    = collapse_internal_ids(options[:payload])
         rest_params[:payload]      = stringify(payload).to_json
-        rest_params[:content_type] = :json
-        rest_params[:accept]       = :json
       end
 
       reply = nil
-      retryable(@retry_limit, Exception) do
+      retryable(@retry_limit, StandardError) do
         reply = RestClient::Request.execute(rest_params) { |response, request, result, &block|
           case response.code
           when 200
@@ -209,7 +206,7 @@ module Netsuite
 
       begin
         parsed = JSON.parse(reply, :symbolize_names=>true)
-      rescue Exception => e
+      rescue => e
         raise "Unable to parse reply from Netsuite: #{reply}"
       end
 
