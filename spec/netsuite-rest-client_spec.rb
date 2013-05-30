@@ -1,25 +1,32 @@
 require 'spec_helper'
 
 describe "NetsuiteRestClient" do
- let(:nsc) {
-   Netsuite::Client.new(ENV['NETSUITE_ACCOUNT_ID'],
-                        ENV['NETSUITE_LOGIN'],
-                        ENV['NETSUITE_PASSWORD'],
-                        ENV['NETSUITE_ROLE_ID'])
- }
+  let(:nsc) do
+    Netsuite::Client.new(
+      '1210093', 'mike@theclymb.com', 'fall2009', 3,
+      #'12345', 'bob@example.com', 'password', 3,
+      :rest_script_id => 18, :rest_deploy_id => 1)
+  end
 
-  it "should get a saved search" do
-    res = nsc.get_saved_search('InventoryItem', '678')
+  it 'can create a blank record' do
+    res = nsc.initialize_record('Vendor')
     res.should_not be_empty
-    res.should be_kind_of(Array)
-    res.first.should be_kind_of(Hash)
-    puts "returned result of #{res.count} rows"
+    res.should be_kind_of(Hash)
+    res[:recordtype].should == 'Vendor'
+  end
+
+  it "should get a record" do
+    res = nsc.get_record('Vendor', '920')
+    res.should_not be_empty
+    res.should be_kind_of(Hash)
+    res[:entityid].should == "Spy Optic, Inc."
+    res[:id].should == '920'
   end
 
   describe "#stringify" do
     it "handles booleans" do
-    nsc.stringify(true).should == "T"
-    nsc.stringify(false).should == "F"
+      nsc.stringify(true).should == "T"
+      nsc.stringify(false).should == "F"
     end
   end
 
