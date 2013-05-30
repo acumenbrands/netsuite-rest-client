@@ -1,9 +1,10 @@
 require 'spec_helper'
+require '~/.netsuite.rb'
 
 describe "NetsuiteRestClient" do
   let(:nsc) do
     Netsuite::Client.new(
-      '1210093', 'mike@theclymb.com', 'fall2009', 3,
+      '1210093', NETSUITE_EMAIL, NETSUITE_PWD, 3,
       #'12345', 'bob@example.com', 'password', 3,
       :rest_script_id => 18, :rest_deploy_id => 1)
   end
