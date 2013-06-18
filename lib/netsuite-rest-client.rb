@@ -199,6 +199,7 @@ module Netsuite
           when 200
             response
           else
+            Honeybadger.context(:netsuite_payload => rest_params[:payload])
             raise "Error with Netsuite response: #{response}"
           end
         }
@@ -207,10 +208,12 @@ module Netsuite
       begin
         parsed = JSON.parse(reply, :symbolize_names=>true)
       rescue => e
+        Honeybadger.context(:netsuite_payload => rest_params[:payload])
         raise "Unable to parse reply from Netsuite: #{reply}"
       end
 
       if !parsed.first || parsed.flatten.include?("UNEXPECTED_ERROR")
+        Honeybadger.context(:netsuite_payload => rest_params[:payload])
         raise "Error processing request: #{parsed.last.to_s}"
       else
         parsed.last
