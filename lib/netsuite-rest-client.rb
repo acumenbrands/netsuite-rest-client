@@ -67,7 +67,14 @@ module Netsuite
       internal_id_list.each_slice(batch_size) do |id_chunk|
         payload['internal_id_list'] = id_chunk
         rc = parse_json_result_from_rest(:post, params, :payload=>payload)
-        results += [rc].flatten
+        case rc
+        when Array
+          results += rc
+        when Hash
+          results += [rc]
+        else
+          raise "Unexpected result from NetSuite: #{rc.inspect}"
+        end
         puts "Fetched #{results.count} records so far..." if options[:verbose]
       end
 
