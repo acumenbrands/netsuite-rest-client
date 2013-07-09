@@ -213,7 +213,7 @@ module Netsuite
       end
 
       begin
-        parsed = JSON.parse(reply, :symbolize_names=>true)
+        parsed = JSON.parse(reply)
       rescue => e
         Honeybadger.context(:netsuite_payload => rest_params[:payload])
         raise "Unable to parse reply from Netsuite: #{reply}"
