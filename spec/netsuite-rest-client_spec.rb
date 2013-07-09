@@ -13,15 +13,15 @@ describe "NetsuiteRestClient" do
     res = nsc.initialize_record('Vendor')
     res.should_not be_empty
     res.should be_kind_of(Hash)
-    res[:recordtype].should == 'Vendor'
+    res['recordtype'].should == 'Vendor'
   end
 
   it "should get a record" do
     res = nsc.get_record('Vendor', '920')
     res.should_not be_empty
     res.should be_kind_of(Hash)
-    res[:entityid].should == "Spy Optic, Inc."
-    res[:id].should == '920'
+    res['entityid'].should == "Spy Optic, Inc."
+    res['id'].should == '920'
   end
 
   describe "#stringify" do
