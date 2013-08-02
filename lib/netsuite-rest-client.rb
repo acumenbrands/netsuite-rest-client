@@ -263,8 +263,8 @@ module Netsuite
     end
 
     def collapse_hashes(data)
-      if (data.keys - [:internalid, :name]).empty?
-        data[:internalid]
+      if (data.keys - ['internalid', 'name']).empty?
+        data['internalid']
       else
         data.each { |k,v| data[k] = collapse_internal_ids(v) }
       end
