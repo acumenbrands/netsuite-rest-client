@@ -120,7 +120,9 @@ module Netsuite
                     'record_type'      => record_type,
                     'record_data'      => record_data_chunk,
                     'do_sourcing'      => options[:do_sourcing] || true,
-                    'ignore_mandatory' => options[:ignore_mandatory] || false }
+                    'ignore_mandatory' => options[:ignore_mandatory] || false,
+                    'static_sublist'   => options[:static_sublist] || false }
+
 
         results += parse_json_result_from_rest(:post, params, :payload=>payload)
       end
