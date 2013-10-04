@@ -3,9 +3,9 @@ require 'json'
 require 'uri'
 
 module Netsuite
+
   class Client
 
-    BASE_URL                      = "https://rest.netsuite.com/app/site/hosting/restlet.nl"
     DEFAULT_SCRIPT_ID             = 13
     DEFAULT_DEPLOY_ID             = 1
     DEFAULT_GET_RECORD_BATCH_SIZE = 10000
@@ -41,6 +41,8 @@ module Netsuite
       @search_batch_size     = options[:search_batch_size]     || DEFAULT_SEARCH_BATCH_SIZE
 
       @retry_limit = options[:retry_limit] || DEFAULT_RETRY_LIMIT
+
+      @sandbox = options[:sandbox]
     end
 
     def initialize_record(record_type)
@@ -232,7 +234,7 @@ module Netsuite
     end
 
     def create_url(params)
-      BASE_URL + '?' + params.map { |key, value| "#{key}=#{value}" }.join('&')
+      base_url + '?' + params.map { |key, value| "#{key}=#{value}" }.join('&')
     end
 
     def retryable(tries, exception, &block)
@@ -244,5 +246,15 @@ module Netsuite
 
       yield
     end
+
+    def base_url
+      if @sandbox
+        "https://rest.sandbox.netsuite.com/app/site/hosting/restlet.nl"
+      else
+        "https://rest.netsuite.com/app/site/hosting/restlet.nl"
+      end
+    end
+
   end
+
 end
