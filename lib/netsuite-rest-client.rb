@@ -84,7 +84,7 @@ module Netsuite
 
       payload = { 'operation'      => 'SEARCH',
                   'record_type'    => record_type,
-                  'start_id'       => 0,
+                  'start_id'       => options.fetch(:start_id, 0),
                   'search_filters' => search_filters,
                   'return_columns' => return_columns }
 
