@@ -163,7 +163,7 @@ module Netsuite
                   'operation'   => 'SAVED',
                   'record_type' => record_type,
                   'search_id'   => search_id,
-                  'start_id'    => 0 }
+                  'start_id'    => options.fetch(:start_id, 0) }
 
       batch_size = options[:search_batch_size] || @search_batch_size
       if batch_size.to_i % 1000 == 0
