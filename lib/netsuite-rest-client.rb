@@ -182,6 +182,20 @@ module Netsuite
       results
     end
 
+    def get_large_saved_search(record_type, search_id, options={})
+      results = Array.new
+      params  = { 'script'      => @script_id,
+                  'deploy'      => @deploy_id,
+                  'operation'   => 'LSAVED',
+                  'record_type' => record_type,
+                  'search_id'   => search_id }
+
+      results_segment = *parse_json_result_from_rest(:get, params)
+      results_segment.class == Array ? results += results_segment : raise("Search error: #{results_segment}")
+
+      results
+    end
+
     def parse_json_result_from_rest(method, params, options={})
       rest_params = { :method  => method,
                       :url     => create_url(params),
